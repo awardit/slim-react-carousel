@@ -1,8 +1,6 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 
-import { searchChildrenForTag } from './utils';
-
 export default class Carousel extends Component {
   static PropTypes = {
     children:       PropTypes.array,
@@ -58,18 +56,17 @@ export default class Carousel extends Component {
       return;
     }
 
-    if (typeof this.props.children.length !== 'undefined') {
-      this.slideElements.forEach(child => {
-        const img = searchChildrenForTag(child , "IMG");
-        if (img) {
-          const interval = setInterval(() => {
-            if (img.complete || (img.height && img.height)) {
-              cb();
-              clearInterval(interval);
-            }
-          }, 10);
+    if (this.element) {
+      const img = this.element.querySelector('img');
+      if (img) {
+        img.onload = () => {
+          cb();
         }
-      });
+
+        if (img.complete) {
+          cb();
+        }
+      }
     }
   }
 
@@ -139,7 +136,9 @@ export default class Carousel extends Component {
     const children = typeof this.props.children !== 'undefined' ? this.props.children : [];
 
     return (
-      <div style={{ width: (slideWidth * slidesToShow) + 'px' }}>
+      <div style={{ width: (slideWidth * slidesToShow) + 'px' }}
+           ref={x => this.element = x}
+      >
         <div style={{
               width: "100%",
               transform: "translateZ(0)",
