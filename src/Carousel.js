@@ -57,7 +57,7 @@ export default class Carousel extends Component {
     }
 
     if (this.element) {
-      const img = this.element.querySelector('img');
+      const img = this.wrapperElement.querySelector('img');
       if (img) {
         img.onload = () => {
           cb();
@@ -136,29 +136,35 @@ export default class Carousel extends Component {
     const children = typeof this.props.children !== 'undefined' ? this.props.children : [];
 
     return (
-      <div style={{ width: (slideWidth * slidesToShow) + 'px' }}
-           ref={x => this.element = x}
+      <div
+        ref={x => this.element = x}
+        style={{ width: (slideWidth * slidesToShow) + 'px' }}
       >
-        <div style={{
-              width: "100%",
-              transform: "translateZ(0)",
-              overflow: "hidden"
-            }}
+        <div
+          style={{
+            width: "100%",
+            transform: "translateZ(0)",
+            overflow: "hidden"
+          }}
         >
-          <div style={{
-                transition: '0.3s ease-in transform',
+          <div
+            ref={x => this.wrapperElement = x}
+            style={{
+              transition: '0.3s ease-in transform',
               width: (slideWidth * children.length) + 'px',
               transform: "translateX(-" + (current * slideWidth) + "px)",
               overflowX: "hidden"
             }}
           >
           {children.length && children.map((slide, i) =>
-            <div key={i}
-                ref={s => this.slideElements[i] = s}
-                style={{
-                  float: 'left',
-                  width: slideWidth + 'px'
-                  }}>
+            <div
+              key={i}
+              ref={s => this.slideElements[i] = s}
+              style={{
+                float: 'left',
+                width: slideWidth + 'px'
+              }}
+            >
               {slide}
             </div>
           )}
