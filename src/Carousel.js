@@ -1,6 +1,8 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 
+import { searchChildrenForTag } from './utils';
+
 export default class Carousel extends Component {
   static PropTypes = {
     children:       PropTypes.array,
@@ -40,20 +42,39 @@ export default class Carousel extends Component {
     document.addEventListener('resize', this.resize);
 
     this.setState({
-    ...this.state,
-    slideWidth: this.getSlideWidth()
+      ...this.state,
+      slideWidth: this.getSlideWidth()
     });
+
+    this.onSlideImageLoad(this.updateDimensions.bind(this));
   }
 
   componentWillUnmount() {
     document.removeEventListener('resize', this.resize);
   }
 
+  onSlideImageLoad(cb) {
+    if (!cb) {
+      return;
+    }
+
+    if (typeof this.props.children.length !== 'undefined') {
+      this.slideElements.forEach(child => {
+        const img = searchChildrenForTag(child , "IMG");
+        if (img) {
+          const interval = setInterval(() => {
+            if (img.complete || (img.height && img.height)) {
+              cb();
+              clearInterval(interval);
+            }
+          }, 10);
+        }
+      });
+    }
+  }
+
   resize() {
-    this.setState({
-      ...this.state,
-      slideWidth: this.getSlideWidth()
-    });
+    this.updateDimensions();
   }
 
   prev() {
@@ -84,7 +105,6 @@ export default class Carousel extends Component {
 
   tick() {
     this.next();
-    console.log('current: ' + this.state.current);
   }
 
   startAutoplay() {
@@ -93,6 +113,13 @@ export default class Carousel extends Component {
 
   stop() {
     clearInterval(this.interval);
+  }
+
+  updateDimensions() {
+    this.setState({
+      ...this.state,
+      slideWidth: this.getSlideWidth()
+    });
   }
 
   getSlideWidth() {
