@@ -9,14 +9,14 @@ ReactDOM.render(
 <div>
   <h2>Normal</h2>
   <Carousel
-    autoplay={true}
+    autoplay={false}
   >
     <Slide /><Slide /><Slide /><Slide /><Slide />
   </Carousel>
 
   <h2>Multiple at once</h2>
   <Carousel
-    autoplay={true}
+    autoplay={false}
     slidesToShow={2}
     slidesToScroll={2}
   >

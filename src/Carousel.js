@@ -3,22 +3,23 @@ import PropTypes from 'prop-types';
 
 export default class Carousel extends Component {
   static PropTypes = {
-    children:       PropTypes.array,
-    slidesToShow:   PropTypes.number,
-    slidesToScroll: PropTypes.number,
-    loopAround:     PropTypes.bool,
-    swiping:        PropTypes.bool,
-    autoPlay:       PropTypes.bool,
-    timer:          PropTypes.number,
-    transitionTime: PropTypes.number,
-    transitionType: PropTypes.string
+    children       : PropTypes.array,
+    slidesToShow   : PropTypes.number,
+    slidesToScroll : PropTypes.number,
+    loopAround     : PropTypes.bool,
+    swiping        : PropTypes.bool,
+    autoPlay       : PropTypes.bool,
+    timer          : PropTypes.number,
+    transitionTime : PropTypes.number,
+    transitionType : PropTypes.string
   };
 
   static defaultProps = {
-    timer: 2000,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: false,
+    timer          : 2000,
+    dragThreshold  : 80,
+    slidesToShow   : 1,
+    slidesToScroll : 1,
+    autoplay       : false,
   }
 
   constructor(props) {
@@ -27,17 +28,18 @@ export default class Carousel extends Component {
     this.slideElements = [];
 
     this.state = {
-      current: 0,
-      slideWidth: 0
+      current      : 0,
+      slideWidth   : 0,
+      touchStart   : null,
+      touchCurrent : null
     };
-
-    if (this.props.autoplay) {
-      this.startAutoplay();
-    }
   }
 
   componentDidMount() {
-    document.addEventListener('resize', this.resize);
+    document.addEventListener('resize', this.onResize);
+    document.addEventListener('touchstart', this.onTouchStart.bind(this));
+    document.addEventListener('touchend', this.onTouchEnd.bind(this));
+    document.addEventListener('touchmove', this.onTouchMove.bind(this));
 
     this.setState({
       ...this.state,
@@ -45,10 +47,17 @@ export default class Carousel extends Component {
     });
 
     this.onSlideImageLoad(this.updateDimensions.bind(this));
+
+    if (this.props.autoplay) {
+      this.startAutoplay();
+    }
   }
 
   componentWillUnmount() {
-    document.removeEventListener('resize', this.resize);
+    document.removeEventListener('resize', this.onResize);
+    document.removeEventListener('touchstart', this.onTouchStart);
+    document.removeEventListener('touchend', this.onTouchEnd);
+    document.removeEventListener('touchmove', this.onTouchMove);
   }
 
   onSlideImageLoad(cb) {
@@ -70,8 +79,56 @@ export default class Carousel extends Component {
     }
   }
 
-  resize() {
+  onResize() {
     this.updateDimensions();
+  }
+
+  getEventTouch(event) {
+    if (!event.touches.length) {
+      return null;
+    }
+    return event.touches.item(0).clientX;
+  }
+
+  onTouchStart(e) {
+    if (!this.element.contains(e.target)) {
+      return;
+    }
+    const touch = this.getEventTouch(e);
+
+    this.setState({
+      ...this.state,
+      touchStart: touch,
+      touchCurrent: touch
+    });
+  }
+
+  onTouchMove(e) {
+    if (this.state.touchStart === null) {
+      return;
+    }
+    this.setState({
+      ...this.state,
+      touchCurrent: this.getEventTouch(e)
+    });
+  }
+
+  onTouchEnd() {
+    if (this.state.touchStart === null) {
+      return;
+    }
+
+    if (this.state.touchCurrent > (this.state.touchStart + this.props.dragThreshold)) {
+      this.prev();
+    } else if (this.state.touchCurrent < (this.state.touchStart - this.props.dragThreshold)) {
+      this.next();
+    } else {
+      this.setState({
+        ...this.state,
+        touchStart   : null,
+        touchCurrent : null
+      });
+    }
   }
 
   prev() {
@@ -83,7 +140,9 @@ export default class Carousel extends Component {
 
     this.setState({
       ...this.state,
-      current: prev
+      current: prev,
+      touchStart   : null,
+      touchCurrent : null
     });
   }
 
@@ -96,7 +155,9 @@ export default class Carousel extends Component {
 
     this.setState({
       ...this.state,
-      current: next
+      current: next,
+      touchStart   : null,
+      touchCurrent : null
     });
   }
 
@@ -132,8 +193,11 @@ export default class Carousel extends Component {
 
   render() {
     const { slidesToShow } = this.props;
-    const { current, slideWidth } = this.state;
-    const children = typeof this.props.children !== 'undefined' ? this.props.children : [];
+    const { current, slideWidth, touchCurrent, touchStart } = this.state;
+
+    const children  = typeof this.props.children !== 'undefined' ? this.props.children : [];
+    const touchDrag = (touchCurrent && touchStart) ? touchCurrent - touchStart : 0;
+    const xPos      = (current * slideWidth) + -touchDrag;
 
     return (
       <div
@@ -150,9 +214,9 @@ export default class Carousel extends Component {
           <div
             ref={x => this.wrapperElement = x}
             style={{
-              transition: '0.3s ease-in transform',
+              transition: touchDrag ? '' : '0.3s ease-in transform',
               width: (slideWidth * children.length) + 'px',
-              transform: "translateX(-" + (current * slideWidth) + "px)",
+              transform: "translateX(-" + xPos + "px)",
               overflowX: "hidden"
             }}
           >
