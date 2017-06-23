@@ -131,10 +131,22 @@ export default class Carousel extends Component {
     }
   }
 
+  resetTouch() {
+    this.setState({
+      ...this.state,
+      touchStart   : null,
+      touchCurrent : null
+    });
+  }
+
   prev() {
     let prev = this.state.current - this.props.slidesToScroll;
 
     if (prev < 0) {
+      if (!this.props.loopAround) {
+        this.resetTouch();
+        return false;
+      }
       prev = this.props.children.length - 1;
     }
 
@@ -150,6 +162,10 @@ export default class Carousel extends Component {
     let next = this.state.current + this.props.slidesToScroll;
 
     if (next > this.props.children.length - 1) {
+      if (!this.props.loopAround) {
+        this.resetTouch();
+        return false;
+      }
       next = 0;
     }
 
@@ -197,7 +213,7 @@ export default class Carousel extends Component {
 
     const children  = typeof this.props.children !== 'undefined' ? this.props.children : [];
     const touchDrag = (touchCurrent && touchStart) ? touchCurrent - touchStart : 0;
-    const xPos      = (current * slideWidth) + -touchDrag;
+    const xPos      = (-(current * slideWidth)) + touchDrag;
 
     return (
       <div
@@ -216,7 +232,7 @@ export default class Carousel extends Component {
             style={{
               transition: touchDrag ? '' : '0.3s ease-in transform',
               width: (slideWidth * children.length) + 'px',
-              transform: "translateX(-" + xPos + "px)",
+              transform: "translateX(" + xPos + "px)",
               overflowX: "hidden"
             }}
           >

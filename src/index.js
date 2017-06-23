@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import Carousel from './Carousel';
 import './index.css';
 
-const Slide = () => <img src="http://via.placeholder.com/350x150" alt="" />;
+const Slide = () => <img src="./dummy-slide.png" alt="" />;
 
 ReactDOM.render(
 <div>
