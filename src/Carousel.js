@@ -11,7 +11,8 @@ export default class Carousel extends Component {
     autoPlay       : PropTypes.bool,
     timer          : PropTypes.number,
     transitionTime : PropTypes.number,
-    transitionType : PropTypes.string
+    transitionType : PropTypes.string,
+    slidePadding   : PropTypes.string
   };
 
   static defaultProps = {
@@ -20,6 +21,7 @@ export default class Carousel extends Component {
     slidesToShow   : 1,
     slidesToScroll : 1,
     autoplay       : false,
+    slidePadding   : 0
   }
 
   constructor(props) {
@@ -208,17 +210,18 @@ export default class Carousel extends Component {
   }
 
   render() {
-    const { slidesToShow } = this.props;
+    const { slidesToShow, slidePadding } = this.props;
     const { current, slideWidth, touchCurrent, touchStart } = this.state;
 
+    const slidePaddings = slidePadding * 2;
     const children  = typeof this.props.children !== 'undefined' ? this.props.children : [];
     const touchDrag = (touchCurrent && touchStart) ? touchCurrent - touchStart : 0;
-    const xPos      = (-(current * slideWidth)) + touchDrag;
+    const xPos      = -(current * (slideWidth + slidePaddings)) + touchDrag;
 
     return (
       <div
         ref={x => this.element = x}
-        style={{ width: (slideWidth * slidesToShow) + 'px' }}
+        style={{ width: ((slideWidth + slidePaddings) * slidesToShow) + 'px' }}
       >
         <div
           style={{
@@ -231,7 +234,7 @@ export default class Carousel extends Component {
             ref={x => this.wrapperElement = x}
             style={{
               transition: touchDrag ? '' : '0.3s ease-in transform',
-              width: (slideWidth * children.length) + 'px',
+              width: (slideWidth + slidePaddings) * children.length + 'px',
               transform: "translateX(" + xPos + "px)",
               overflowX: "hidden"
             }}
@@ -242,7 +245,8 @@ export default class Carousel extends Component {
               ref={s => this.slideElements[i] = s}
               style={{
                 float: 'left',
-                width: slideWidth + 'px'
+                width: slideWidth + 'px',
+                padding: slidePadding + 'px'
               }}
             >
               {slide}
