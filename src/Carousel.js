@@ -16,6 +16,7 @@ export default class Carousel extends Component {
   };
 
   static defaultProps = {
+    swiping        : true,
     timer          : 2000,
     dragThreshold  : 80,
     slidesToShow   : 1,
@@ -39,9 +40,17 @@ export default class Carousel extends Component {
 
   componentDidMount() {
     document.addEventListener('resize', this.onResize);
+
+    this.element.addEventListener('dragstart', this.onDragstart);
+
     document.addEventListener('touchstart', this.onTouchStart.bind(this));
+    document.addEventListener('mousedown', this.onTouchStart.bind(this));
+
     document.addEventListener('touchend', this.onTouchEnd.bind(this));
+    document.addEventListener('mouseup', this.onTouchEnd.bind(this));
+
     document.addEventListener('touchmove', this.onTouchMove.bind(this));
+    document.addEventListener('mousemove', this.onTouchMove.bind(this));
 
     this.setState({
       ...this.state,
@@ -60,6 +69,11 @@ export default class Carousel extends Component {
     document.removeEventListener('touchstart', this.onTouchStart);
     document.removeEventListener('touchend', this.onTouchEnd);
     document.removeEventListener('touchmove', this.onTouchMove);
+    this.element.removeEventListener('dragstart', this.onDragstart);
+  }
+
+  onDragstart(e) {
+    e.preventDefault();
   }
 
   onSlideImageLoad(cb) {
@@ -86,6 +100,9 @@ export default class Carousel extends Component {
   }
 
   getEventTouch(event) {
+    if (typeof event.touches === 'undefined') {
+      return event.clientX;
+    }
     if (!event.touches.length) {
       return null;
     }
@@ -93,6 +110,9 @@ export default class Carousel extends Component {
   }
 
   onTouchStart(e) {
+    if (!this.props.swiping) {
+      return;
+    }
     if (!this.element.contains(e.target)) {
       return;
     }
