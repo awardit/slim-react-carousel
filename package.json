@@ -2,6 +2,7 @@
   "name": "rc-carousel",
   "version": "0.1.0",
   "license": "MIT",
+  "homepage": "http://github.com/peterasplund/rc-carousel",
   "scripts": {
     "dev": "nodemon -w src -w tests --exec 'npm run test --silent'",
     "build": "node rollup.js",
