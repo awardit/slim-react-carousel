@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "nodemon -w src -w tests --exec 'npm run test --silent'",
     "build": "node rollup.js",
+    "prepublish": "node rollup.js",
     "test": "tap -Rspec --node-arg=--require --node-arg=babel-register tests/*.test.js"
   },
   "main": "dist/index.js",
