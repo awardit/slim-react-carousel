@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "license": "MIT",
   "homepage": "http://github.com/peterasplund/slim-react-carousel",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:peterasplund/slim-react-carousel.git"
+  },
   "scripts": {
     "dev": "nodemon -w src -w tests --exec 'npm run test --silent'",
     "build": "node rollup.js",
