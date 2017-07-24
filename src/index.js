@@ -8,7 +8,9 @@ const Slide = () => <img src="./dummy-slide.png" alt="" />;
 ReactDOM.render(
 <div>
   <h2>Normal</h2>
-  <Carousel swiping={false}>
+  <Carousel
+    controlType="dots"
+  >
     <Slide /><Slide /><Slide /><Slide /><Slide />
   </Carousel>
 
@@ -25,6 +27,7 @@ ReactDOM.render(
     slidesToShow={2}
     slidesToScroll={2}
     slidePadding={10}
+    controlType="nextPrev"
   >
     <Slide /><Slide /><Slide /><Slide /><Slide />
   </Carousel>

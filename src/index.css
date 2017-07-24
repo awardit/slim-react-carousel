@@ -3,3 +3,22 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.carousel__controls {
+  display: flex;
+  justify-content: center;
+}
+
+.carousel__dot {
+  outline: none;
+  border: 1px solid #555;
+  background: none;
+  border-radius: 50%;
+  padding: 0.4rem;
+  margin: 0.2em;
+}
+
+.carousel__dot--active {
+  font-weight: bold;
+  background: #22a287;
+}

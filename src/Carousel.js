@@ -12,7 +12,10 @@ export default class Carousel extends Component {
     timer          : PropTypes.number,
     transitionTime : PropTypes.number,
     transitionType : PropTypes.string,
-    slidePadding   : PropTypes.string
+    slidePadding   : PropTypes.string,
+
+    // dots, nextPrev
+    controlType    : PropTypes.string
   };
 
   static defaultProps = {
@@ -62,6 +65,9 @@ export default class Carousel extends Component {
     if (this.props.autoplay) {
       this.startAutoplay();
     }
+
+    this.boundNext = this.next.bind(this);
+    this.boundPrev = this.prev.bind(this);
   }
 
   componentWillUnmount() {
@@ -161,6 +167,17 @@ export default class Carousel extends Component {
     });
   }
 
+  setCurrent(index) {
+    if (index => 0 && index <= this.props.children.length) {
+      this.setState({
+        ...this.state,
+        current: index,
+        touchStart   : null,
+        touchCurrent : null
+      });
+    }
+  }
+
   prev() {
     let prev = this.state.current - this.props.slidesToScroll;
 
@@ -172,12 +189,7 @@ export default class Carousel extends Component {
       prev = this.props.children.length - 1;
     }
 
-    this.setState({
-      ...this.state,
-      current: prev,
-      touchStart   : null,
-      touchCurrent : null
-    });
+    this.setCurrent(prev);
   }
 
   next() {
@@ -191,12 +203,7 @@ export default class Carousel extends Component {
       next = 0;
     }
 
-    this.setState({
-      ...this.state,
-      current: next,
-      touchStart   : null,
-      touchCurrent : null
-    });
+    this.setCurrent(next);
   }
 
   tick() {
@@ -207,7 +214,7 @@ export default class Carousel extends Component {
     this.interval = setInterval(this.tick.bind(this), this.props.timer);
   }
 
-  stop() {
+  stopAutoplay() {
     clearInterval(this.interval);
   }
 
@@ -229,12 +236,25 @@ export default class Carousel extends Component {
     return children[0].offsetWidth;
   }
 
+  getChildren() {
+    return React.Children.map(this.props.children, child => {
+      return React.cloneElement(child, {
+        ...child.props,
+        setCurrent    : this.setCurrent,
+        prev          : this.prev,
+        next          : this.next,
+        startAutoplay : this.startAutoplay,
+        stopAutoplay  : this.stopAutoplay
+      })
+    })
+  }
+
   render() {
-    const { slidesToShow, slidePadding } = this.props;
+    const { slidesToShow, slidePadding, controlType } = this.props;
     const { current, slideWidth, touchCurrent, touchStart } = this.state;
 
     const slidePaddings = slidePadding * 2;
-    const children  = typeof this.props.children !== 'undefined' ? this.props.children : [];
+    const children = this.getChildren();
     const touchDrag = (touchCurrent && touchStart) ? touchCurrent - touchStart : 0;
     const xPos      = -(current * (slideWidth + slidePaddings)) + touchDrag;
 
@@ -274,6 +294,24 @@ export default class Carousel extends Component {
           )}
           </div>
         </div>
+
+        {controlType === 'nextPrev' &&
+          <div className="carousel__controls">
+            <button onClick={this.boundPrev}>prev</button>
+            <button onClick={this.boundNext}>next</button>
+          </div>
+        }
+        {controlType === 'dots' &&
+          <div className="carousel__controls">
+            {Array.from({length: children.length}, (v, k) => k).map(x =>
+              <button
+                className={current === x ? 'carousel__dot carousel__dot--active' : 'carousel__dot'}
+                onClick={() => this.setCurrent(x)}
+              >
+              </button>
+            )}
+          </div>
+        }
       </div>
     );
   }
