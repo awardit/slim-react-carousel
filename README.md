@@ -28,36 +28,63 @@ ReactDOM.render(
 
 Props
 =====
-*children*
-`array`
-
-*slidesToShow*
-`number`
-
-*slidesToScroll*
-`number`
-
-*loopAround*
-`bool`
-
-*swiping*
-`bool`
-
-*autoPlay*
-`bool`
-
-*timer*
-`number`
-
-*transitionTime*
-`number`
-
-*transitionType*
-`string`
-
-*slidePadding*
-`string`
-
-*controlType*
-`PropTypes.string`
-options: dots, nextPrev
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th style="width: 100px;">name</th>
+      <th style="width: 50px;">type</th>
+      <th style="width: 50px;">default</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>children</td>
+      <td>array</td>
+      <td>[]</td>
+      <td>React children. Just pass the slides as children</td>
+    </tr>
+    <tr>
+      <td>slidesToShow</td>
+      <td>number</td>
+      <td>1</td>
+      <td>How many slides to show at the same time</td>
+    </tr>
+    <tr>
+      <td>slidesToScroll</td>
+      <td>number</td>
+      <td>1</td>
+      <td>How many slides to scroll at the same time</td>
+    </tr>
+    <tr>
+      <td>swiping</td>
+      <td>bool</td>
+      <td>true</td>
+      <td>Allow swipe controls</td>
+    </tr>
+    <tr>
+      <td>autoPlay</td>
+      <td>bool</td>
+      <td>false</td>
+      <td>Step through the carousel automatically</td>
+    </tr>
+    <tr>
+      <td>timer</td>
+      <td>number</td>
+      <td>2000</td>
+      <td>Time between each slide when autoPlay is enabled</td>
+    </tr>
+    <tr>
+      <td>slidePadding</td>
+      <td>string</td>
+      <td>0</td>
+      <td>Padding around each slide</td>
+    </tr>
+    <tr>
+      <td>controlType</td>
+      <td>string</td>
+      <td></td>
+      <td>Which control layout to use. Types: `dots`, `nextPrev`</td>
+    </tr>
+  </tbody>
+</table>

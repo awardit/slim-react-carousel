@@ -10,8 +10,6 @@ export default class Carousel extends Component {
     swiping        : PropTypes.bool,
     autoPlay       : PropTypes.bool,
     timer          : PropTypes.number,
-    transitionTime : PropTypes.number,
-    transitionType : PropTypes.string,
     slidePadding   : PropTypes.string,
 
     // dots, nextPrev
@@ -25,7 +23,7 @@ export default class Carousel extends Component {
     slidesToShow   : 1,
     slidesToScroll : 1,
     autoplay       : false,
-    slidePadding   : 0
+    slidePadding   : '0'
   }
 
   constructor(props) {
@@ -305,6 +303,7 @@ export default class Carousel extends Component {
           <div className="carousel__controls">
             {Array.from({length: children.length}, (v, k) => k).map(x =>
               <button
+                key={x}
                 className={current === x ? 'carousel__dot carousel__dot--active' : 'carousel__dot'}
                 onClick={() => this.setCurrent(x)}
               >
