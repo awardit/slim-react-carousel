@@ -1,0 +1,4 @@
+{
+  "presets": ["es2015"],
+  "plugins": ["syntax-jsx", "babel-plugin-transform-class-properties", "babel-plugin-transform-object-rest-spread", "transform-react-jsx"]
+}

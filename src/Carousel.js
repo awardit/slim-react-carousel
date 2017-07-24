@@ -235,16 +235,7 @@ export default class Carousel extends Component {
   }
 
   getChildren() {
-    return React.Children.map(this.props.children, child => {
-      return React.cloneElement(child, {
-        ...child.props,
-        setCurrent    : this.setCurrent,
-        prev          : this.prev,
-        next          : this.next,
-        startAutoplay : this.startAutoplay,
-        stopAutoplay  : this.stopAutoplay
-      })
-    })
+    return this.props.children ? this.props.children : [];
   }
 
   render() {
