@@ -3,18 +3,18 @@ A small composable carousel using React for rendering.
 
 Demo
 ===
-Comming soon
+Coming soon
 
 Install
 =======
-Comming soon
+Coming soon
 
 Usage
 =====
 ```javascript
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Carousel from 'npm-name'; // comming soon
+import Carousel from 'npm-name'; // coming soon
 
 ReactDOM.render(
   <Carousel>
