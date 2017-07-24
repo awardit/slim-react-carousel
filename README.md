@@ -7,14 +7,16 @@ Coming soon
 
 Install
 =======
-Coming soon
+```
+npm install --save rc-carousel;
+```
 
 Usage
 =====
 ```javascript
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Carousel from 'npm-name'; // coming soon
+import Carousel from 'rc-carousel';
 
 ReactDOM.render(
   <Carousel>
