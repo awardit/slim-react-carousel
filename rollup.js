@@ -10,7 +10,7 @@ const minify       = require("uglify-js").minify;
 const targets = {
   "":       { format: "cjs", sourceMap: true },
   "es2015": { format: "es",  sourceMap: true },
-  "umd":    { format: "umd", sourceMap: true, moduleName: "rc-carousel" }
+  "umd":    { format: "umd", sourceMap: true, moduleName: "slim-react-carousel" }
 };
 
 const shared = {

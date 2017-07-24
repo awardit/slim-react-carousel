@@ -1,4 +1,4 @@
-# React Carousel
+# Slim React Carousel
 A small composable carousel using React for rendering.
 
 Demo
@@ -8,7 +8,7 @@ Coming soon
 Install
 =======
 ```
-npm install --save rc-carousel;
+npm install --save slim-react-carousel;
 ```
 
 Usage
@@ -16,7 +16,7 @@ Usage
 ```javascript
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Carousel from 'rc-carousel';
+import Carousel from 'slim-react-carousel';
 
 ReactDOM.render(
   <Carousel>
