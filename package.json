@@ -1,6 +1,6 @@
 {
   "name": "slim-react-carousel",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "homepage": "http://github.com/peterasplund/slim-react-carousel",
   "repository": {
@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "nodemon -w src -w tests --exec 'npm run test --silent'",
     "build": "node rollup.js",
-    "prepublish": "node rollup.js",
+    "prepare": "node rollup.js",
     "test": "tap -Rspec --node-arg=--require --node-arg=babel-register tests/*.test.js"
   },
   "main": "dist/index.js",
