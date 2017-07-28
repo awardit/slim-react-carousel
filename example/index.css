@@ -4,6 +4,10 @@ body {
   font-family: sans-serif;
 }
 
+.carousel img {
+  width: 100%;
+}
+
 .carousel__controls {
   display: flex;
   justify-content: center;

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Carousel from '../dist/index.js';
+import Carousel from '../src/index.js';
 
 const Slide = () => <img src="http://via.placeholder.com/400x150" alt="" />;
 
@@ -14,12 +14,14 @@ ReactDOM.render(
     <Slide /><Slide /><Slide /><Slide /><Slide />
   </Carousel>
 
-  <h2>Cell padding</h2>
-  <Carousel
-    slidePadding={10}
-  >
-    <Slide /><Slide /><Slide /><Slide /><Slide />
-  </Carousel>
+  <div style={{width: '200px'}}>
+    <h2>Cell padding</h2>
+    <Carousel
+      slidePadding={10}
+    >
+      <Slide /><Slide /><Slide /><Slide /><Slide />
+    </Carousel>
+  </div>
 
   <h2>Multiple at once</h2>
   <Carousel
