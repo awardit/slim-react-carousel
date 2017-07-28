@@ -40,7 +40,7 @@ export default class Carousel extends Component {
   }
 
   componentDidMount() {
-    document.addEventListener('resize', this.onResize);
+    window.addEventListener('resize', this.onResize.bind(this));
 
     this.element.addEventListener('dragstart', this.onDragstart);
 
@@ -69,7 +69,7 @@ export default class Carousel extends Component {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('resize', this.onResize);
+    document.removeEventListener('resize', this.onResize.bind(this));
     document.removeEventListener('touchstart', this.onTouchStart);
     document.removeEventListener('touchend', this.onTouchEnd);
     document.removeEventListener('touchmove', this.onTouchMove);
@@ -100,6 +100,7 @@ export default class Carousel extends Component {
   }
 
   onResize() {
+    console.log('on resize')
     this.updateDimensions();
   }
 
@@ -217,9 +218,12 @@ export default class Carousel extends Component {
   }
 
   updateDimensions() {
+    const elementWidth = this.element.offsetWidth;
+    const slideWidth = this.getSlideWidth();
+    console.log(Math.min(slideWidth, elementWidth))
     this.setState({
       ...this.state,
-      slideWidth: this.getSlideWidth()
+      slideWidth: Math.min(slideWidth, elementWidth)
     });
   }
 
@@ -230,6 +234,9 @@ export default class Carousel extends Component {
     const children = this.slideElements[0].childNodes;
     if (!children[0]) {
       return this.slideElements[0].offsetWidth;
+    }
+    if (children[0].tagName === 'IMG') {
+      return children[0].naturalWidth;
     }
     return children[0].offsetWidth;
   }
@@ -249,12 +256,12 @@ export default class Carousel extends Component {
 
     return (
       <div
+        className="carousel"
         ref={x => this.element = x}
-        style={{ width: ((slideWidth + slidePaddings) * slidesToShow) + 'px' }}
       >
         <div
           style={{
-            width: "100%",
+            width: (slideWidth + slidePaddings) * slidesToShow + 'px',
             transform: "translateZ(0)",
             overflow: "hidden"
           }}
@@ -283,25 +290,30 @@ export default class Carousel extends Component {
           )}
           </div>
         </div>
-
-        {controlType === 'nextPrev' &&
-          <div className="carousel__controls">
-            <button onClick={this.boundPrev}>prev</button>
-            <button onClick={this.boundNext}>next</button>
-          </div>
-        }
-        {controlType === 'dots' &&
-          <div className="carousel__controls">
-            {Array.from({length: children.length}, (v, k) => k).map(x =>
-              <button
-                key={x}
-                className={current === x ? 'carousel__dot carousel__dot--active' : 'carousel__dot'}
-                onClick={() => this.setCurrent(x)}
-              >
-              </button>
-            )}
-          </div>
-        }
+        <div className="carousel__controls"
+            style={{
+              width: (slideWidth + slidePaddings) * slidesToShow + 'px'
+            }}
+        >
+          {controlType === 'nextPrev' &&
+            <div>
+              <button onClick={this.boundPrev}>prev</button>
+              <button onClick={this.boundNext}>next</button>
+            </div>
+          }
+          {controlType === 'dots' &&
+            <div>
+              {Array.from({length: children.length}, (v, k) => k).map(x =>
+                <button
+                  key={x}
+                  className={current === x ? 'carousel__dot carousel__dot--active' : 'carousel__dot'}
+                  onClick={() => this.setCurrent(x)}
+                >
+                </button>
+              )}
+            </div>
+          }
+        </div>
       </div>
     );
   }
