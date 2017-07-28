@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-/*
-import Carousel from '../dist/index.es2015.js';
 
-const Slide = () => <img src="./dummy-slide.png" alt="" />;
+import Carousel from '../dist/index.js';
+
+const Slide = () => <img src="http://via.placeholder.com/400x150" alt="" />;
 
 ReactDOM.render(
 <div>
@@ -33,4 +33,3 @@ ReactDOM.render(
   </Carousel>
 </div>
 , document.getElementById('root'));
-*/
