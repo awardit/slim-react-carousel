@@ -262,7 +262,7 @@ export default class Carousel extends Component {
     const slideOriginalWidth  = this.getSlideOriginalWidth();
     const slideWidth          = Math.min(slideOriginalWidth, (wrapperWidth - slidePadding * (slidesToShow + 1)) / slidesToShow);
     const trackWidth          = (slideWidth + (slidePadding * 2)) * this.getChildren().length;
-    const frameWidth          = Math.min(((slideWidth + (slidePadding * 2)) * slidesToShow), wrapperWidth);
+    const frameWidth          = Math.min((slideWidth + slidePadding) * slidesToShow + slidePadding, wrapperWidth);
 
     this.setState({
       ...this.state,
