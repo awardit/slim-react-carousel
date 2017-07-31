@@ -1,6 +1,31 @@
 import React, { Component }  from 'react';
 import PropTypes from 'prop-types';
 
+const frameStyles = (_, { frameWidth }) => ({
+  maxWidth:  frameWidth + 'px',
+  transform: 'translateZ(0)',
+  overflow:  'hidden'
+});
+
+const slideStyles = ({ slidePadding }, { slideWidth}) => ({
+  float:  'left',
+  width:   slideWidth   + 'px',
+  padding: slidePadding + 'px'
+});
+
+const trackStyles = ({ slidePadding }, { current, slideWidth, trackWidth, touchCurrent, touchStart}) => {
+  const slidePaddings = slidePadding * 2;
+  const touchDrag     = (touchCurrent && touchStart) ? touchCurrent - touchStart : 0;
+  const xPos          = -(current * (slideWidth + slidePaddings)) + touchDrag;
+
+  return {
+    transition: touchDrag ? '' : '0.3s ease-in transform',
+    width:      trackWidth + 'px',
+    transform:  'translateX(' + xPos + 'px)',
+    overflowX:  'hidden'
+  }
+};
+
 export default class Carousel extends Component {
   static PropTypes = {
     children       : PropTypes.array,
@@ -11,9 +36,7 @@ export default class Carousel extends Component {
     autoPlay       : PropTypes.bool,
     timer          : PropTypes.number,
     slidePadding   : PropTypes.string,
-
-    // dots, nextPrev
-    controlType    : PropTypes.string
+    controlType    : PropTypes.oneOf([ '', 'dots', 'nextPrev' ])
   };
 
   static defaultProps = {
@@ -32,30 +55,31 @@ export default class Carousel extends Component {
     this.slideElements = [];
 
     this.state = {
-      current      : 0,
-      slideWidth   : 0,
-      touchStart   : null,
-      touchCurrent : null
+      current            : 0,
+      slideWidth         : 0,
+      trackWidth         : 0,
+      touchStart         : null,
+      touchCurrent       : null
     };
   }
 
   componentDidMount() {
     window.addEventListener('resize', this.onResize.bind(this));
 
-    this.element.addEventListener('dragstart', this.onDragstart);
+    this.frameElement.addEventListener('dragstart', this.onDragstart);
 
-    document.addEventListener('touchstart', this.onTouchStart.bind(this));
-    document.addEventListener('mousedown', this.onTouchStart.bind(this));
+    this.frameElement.addEventListener('touchstart', this.onTouchStart.bind(this));
+    this.frameElement.addEventListener('mousedown', this.onTouchStart.bind(this));
 
-    document.addEventListener('touchend', this.onTouchEnd.bind(this));
-    document.addEventListener('mouseup', this.onTouchEnd.bind(this));
+    window.addEventListener('touchend', this.onTouchEnd.bind(this));
+    window.addEventListener('mouseup', this.onTouchEnd.bind(this));
 
-    document.addEventListener('touchmove', this.onTouchMove.bind(this));
-    document.addEventListener('mousemove', this.onTouchMove.bind(this));
+    this.frameElement.addEventListener('touchmove', this.onTouchMove.bind(this));
+    this.frameElement.addEventListener('mousemove', this.onTouchMove.bind(this));
 
     this.setState({
       ...this.state,
-      slideWidth: this.getSlideWidth()
+      slideWidth: this.getSlideOriginalWidth()
     });
 
     this.onSlideImageLoad(this.updateDimensions.bind(this));
@@ -69,11 +93,18 @@ export default class Carousel extends Component {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('resize', this.onResize.bind(this));
-    document.removeEventListener('touchstart', this.onTouchStart);
-    document.removeEventListener('touchend', this.onTouchEnd);
-    document.removeEventListener('touchmove', this.onTouchMove);
-    this.element.removeEventListener('dragstart', this.onDragstart);
+    window.removeEventListener('resize', this.onResize.bind(this));
+
+    this.frameElement.removeEventListener('dragstart', this.onDragstart);
+
+    this.frameElement.removeEventListener('touchstart', this.onTouchStart);
+    this.frameElement.removeEventListener('mousedown', this.onTouchStart);
+
+    window.removeEventListener('touchend', this.onTouchEnd);
+    window.removeEventListener('mouseup', this.onTouchEnd);
+
+    this.frameElement.removeEventListener('touchmove', this.onTouchMove);
+    this.frameElement.removeEventListener('mousemove', this.onTouchMove);
   }
 
   onDragstart(e) {
@@ -85,8 +116,8 @@ export default class Carousel extends Component {
       return;
     }
 
-    if (this.element) {
-      const img = this.wrapperElement.querySelector('img');
+    if (this.wrapperElement) {
+      const img = this.trackElement.querySelector('img');
       if (img) {
         img.onload = () => {
           cb();
@@ -100,7 +131,6 @@ export default class Carousel extends Component {
   }
 
   onResize() {
-    console.log('on resize')
     this.updateDimensions();
   }
 
@@ -118,7 +148,7 @@ export default class Carousel extends Component {
     if (!this.props.swiping) {
       return;
     }
-    if (!this.element.contains(e.target)) {
+    if (!this.wrapperElement.contains(e.target)) {
       return;
     }
     const touch = this.getEventTouch(e);
@@ -158,6 +188,15 @@ export default class Carousel extends Component {
     }
   }
 
+  onClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (e.nativeEvent) {
+      e.nativeEvent.stopPropagation();
+    }
+  }
+
   resetTouch() {
     this.setState({
       ...this.state,
@@ -185,7 +224,7 @@ export default class Carousel extends Component {
         this.resetTouch();
         return false;
       }
-      prev = this.props.children.length - 1;
+      prev = this.getChildren().length - 1;
     }
 
     this.setCurrent(prev);
@@ -194,7 +233,7 @@ export default class Carousel extends Component {
   next() {
     let next = this.state.current + this.props.slidesToScroll;
 
-    if (next > this.props.children.length - 1) {
+    if (next > this.getChildren().length - 1) {
       if (!this.props.loopAround) {
         this.resetTouch();
         return false;
@@ -217,17 +256,29 @@ export default class Carousel extends Component {
     clearInterval(this.interval);
   }
 
+  // todo: fix responsive slide logic here
   updateDimensions() {
-    const elementWidth = this.element.offsetWidth;
-    const slideWidth = this.getSlideWidth();
-    console.log(Math.min(slideWidth, elementWidth))
+    const { slidesToShow, slidePadding } = this.props;
+
+    const wrapperWidth        = this.wrapperElement.offsetWidth;
+    const slideOriginalWidth  = this.getSlideOriginalWidth();
+    const frameWidth          = (slideOriginalWidth + (slidePadding * 2)) * slidesToShow;
+
+    let slideWidth = (slideOriginalWidth + (slidePadding * 2)) * slidesToShow;
+    slideWidth = Math.min(slideOriginalWidth, wrapperWidth);
+
+    const trackWidth = (slideWidth + (slidePadding * 2)) * this.getChildren().length;
+
     this.setState({
       ...this.state,
-      slideWidth: Math.min(slideWidth, elementWidth)
+      wrapperWidth,
+      slideWidth,
+      frameWidth,
+      trackWidth
     });
   }
 
-  getSlideWidth() {
+  getSlideOriginalWidth() {
     if (!this.slideElements.length) {
       return null;
     }
@@ -247,43 +298,32 @@ export default class Carousel extends Component {
 
   render() {
     const { slidesToShow, slidePadding, controlType } = this.props;
-    const { current, slideWidth, touchCurrent, touchStart } = this.state;
+    const { current, frameWidth } = this.state;
 
     const slidePaddings = slidePadding * 2;
     const children = this.getChildren();
-    const touchDrag = (touchCurrent && touchStart) ? touchCurrent - touchStart : 0;
-    const xPos      = -(current * (slideWidth + slidePaddings)) + touchDrag;
 
     return (
       <div
-        className="carousel"
-        ref={x => this.element = x}
+        className="carousel wrapperElement"
+        ref={x => this.wrapperElement = x}
       >
         <div
-          style={{
-            width: (slideWidth + slidePaddings) * slidesToShow + 'px',
-            transform: "translateZ(0)",
-            overflow: "hidden"
-          }}
+          className="frameElement"
+          ref={x => this.frameElement = x}
+          style={frameStyles(this.props, this.state)}
         >
           <div
-            ref={x => this.wrapperElement = x}
-            style={{
-              transition: touchDrag ? '' : '0.3s ease-in transform',
-              width: (slideWidth + slidePaddings) * children.length + 'px',
-              transform: "translateX(" + xPos + "px)",
-              overflowX: "hidden"
-            }}
+            className="trackElement"
+            ref={x => this.trackElement = x}
+            onClick={this.onClick}
+            style={trackStyles(this.props, this.state)}
           >
           {children.length && children.map((slide, i) =>
             <div
               key={i}
               ref={s => this.slideElements[i] = s}
-              style={{
-                float: 'left',
-                width: slideWidth + 'px',
-                padding: slidePadding + 'px'
-              }}
+              style={slideStyles(this.props, this.state)}
             >
               {slide}
             </div>
@@ -291,9 +331,7 @@ export default class Carousel extends Component {
           </div>
         </div>
         <div className="carousel__controls"
-            style={{
-              width: (slideWidth + slidePaddings) * slidesToShow + 'px'
-            }}
+            style={{ width: frameWidth + 'px' }}
         >
           {controlType === 'nextPrev' &&
             <div>
