@@ -14,20 +14,11 @@ ReactDOM.render(
     <Slide /><Slide /><Slide /><Slide /><Slide />
   </Carousel>
 
-  <div style={{width: '200px'}}>
-    <h2>Cell padding</h2>
-    <Carousel
-      slidePadding={10}
-    >
-      <Slide /><Slide /><Slide /><Slide /><Slide />
-    </Carousel>
-  </div>
-
   <h2>Multiple at once</h2>
   <Carousel
     autoplay={false}
-    slidesToShow={2}
-    slidesToScroll={2}
+    slidesToShow={3}
+    slidesToScroll={3}
     slidePadding={10}
     controlType="nextPrev"
   >

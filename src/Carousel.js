@@ -10,13 +10,12 @@ const frameStyles = (_, { frameWidth }) => ({
 const slideStyles = ({ slidePadding }, { slideWidth}) => ({
   float:  'left',
   width:   slideWidth   + 'px',
-  padding: slidePadding + 'px'
+  paddingLeft: slidePadding + 'px'
 });
 
 const trackStyles = ({ slidePadding }, { current, slideWidth, trackWidth, touchCurrent, touchStart}) => {
-  const slidePaddings = slidePadding * 2;
   const touchDrag     = (touchCurrent && touchStart) ? touchCurrent - touchStart : 0;
-  const xPos          = -(current * (slideWidth + slidePaddings)) + touchDrag;
+  const xPos          = -(current * (slideWidth + slidePadding)) + touchDrag;
 
   return {
     transition: touchDrag ? '' : '0.3s ease-in transform',
@@ -46,7 +45,7 @@ export default class Carousel extends Component {
     slidesToShow   : 1,
     slidesToScroll : 1,
     autoplay       : false,
-    slidePadding   : '0'
+    slidePadding   : 0
   }
 
   constructor(props) {
@@ -256,18 +255,14 @@ export default class Carousel extends Component {
     clearInterval(this.interval);
   }
 
-  // todo: fix responsive slide logic here
   updateDimensions() {
     const { slidesToShow, slidePadding } = this.props;
 
     const wrapperWidth        = this.wrapperElement.offsetWidth;
     const slideOriginalWidth  = this.getSlideOriginalWidth();
-    const frameWidth          = (slideOriginalWidth + (slidePadding * 2)) * slidesToShow;
-
-    let slideWidth = (slideOriginalWidth + (slidePadding * 2)) * slidesToShow;
-    slideWidth = Math.min(slideOriginalWidth, wrapperWidth);
-
-    const trackWidth = (slideWidth + (slidePadding * 2)) * this.getChildren().length;
+    const slideWidth          = Math.min(slideOriginalWidth, (wrapperWidth - slidePadding * (slidesToShow + 1)) / slidesToShow);
+    const trackWidth          = (slideWidth + (slidePadding * 2)) * this.getChildren().length;
+    const frameWidth          = Math.min(((slideWidth + (slidePadding * 2)) * slidesToShow), wrapperWidth);
 
     this.setState({
       ...this.state,
@@ -331,7 +326,7 @@ export default class Carousel extends Component {
           </div>
         </div>
         <div className="carousel__controls"
-            style={{ width: frameWidth + 'px' }}
+            style={{ maxWidth: frameWidth + 'px' }}
         >
           {controlType === 'nextPrev' &&
             <div>
