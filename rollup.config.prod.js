@@ -9,7 +9,22 @@ const sharedConfig = require("./rollup.config.shared");
 // TODO: add uglification
 
 module.exports = Object.assign(sharedConfig, {
-  entry: 'src/index.js',
+  entry:  'src/index.js',
+  targets: [
+    {
+      dest:   'dist/index.es2015.js',
+      format: 'es',
+    },
+    {
+      dest:   'dist/index.cjs.js',
+      format: 'cjs',
+    },
+    {
+      dest:       'dist/index.js',
+      format:     'iife',
+      moduleName: 'slimReactCarousel',
+    },
+  ],
   plugins: sharedConfig.plugins.slice().concat([
     replace({
       "process.env.NODE_ENV": JSON.stringify("production")
@@ -23,5 +38,12 @@ module.exports = Object.assign(sharedConfig, {
     })
     */
   ]),
-  dest: 'dist/index.js'
+  globals: {
+    react: 'React',
+    'prop-types': 'PropTypes',
+  },
+  external: [
+    "react",
+    "prop-types"
+  ]
 });
