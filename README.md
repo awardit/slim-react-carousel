@@ -78,14 +78,14 @@ Props
     </tr>
     <tr>
       <td>slidePadding</td>
-      <td>string</td>
+      <td>number</td>
       <td>0</td>
       <td>Padding around each slide</td>
     </tr>
     <tr>
       <td>controlType</td>
       <td>string</td>
-      <td></td>
+      <td>""</td>
       <td>Which control layout to use. Types: `dots`, `nextPrev`</td>
     </tr>
   </tbody>
