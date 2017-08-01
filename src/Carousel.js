@@ -184,11 +184,7 @@ export default class Carousel extends Component {
       });
     }
   }
-
   onClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
     if (e.nativeEvent) {
       e.nativeEvent.stopPropagation();
     }
