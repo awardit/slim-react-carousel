@@ -145,9 +145,6 @@ export default class Carousel extends Component {
     if (!this.props.swiping) {
       return;
     }
-    if (!this.wrapperElement.contains(e.target)) {
-      return;
-    }
     const touch = this.getEventTouch(e);
 
     this.setState({
