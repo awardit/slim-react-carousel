@@ -247,7 +247,13 @@ export default class Carousel extends Component {
   }
 
   tick() {
-    this.next();
+    let next = this.state.current + this.props.slidesToScroll;
+
+    if (next > this.getChildren().length - 1) {
+      next = 0;
+    }
+
+    this.setCurrent(next);
   }
 
   startAutoplay() {

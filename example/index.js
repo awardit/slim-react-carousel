@@ -11,6 +11,7 @@ ReactDOM.render(
   <h2>Normal</h2>
   <Carousel
     controlType="dots"
+    autoplay={true}
   >
     <Slide /><Slide /><Slide /><Slide /><Slide />
   </Carousel>
@@ -24,7 +25,6 @@ ReactDOM.render(
 
   <h2>Multiple at once</h2>
   <Carousel
-    autoplay={false}
     slidesToShow={3}
     slidesToScroll={3}
     slidePadding={10}
