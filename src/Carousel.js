@@ -54,11 +54,12 @@ export default class Carousel extends Component {
     this.slideElements = [];
 
     this.state = {
-      current            : 0,
-      slideWidth         : 0,
-      trackWidth         : 0,
-      touchStart         : null,
-      touchCurrent       : null
+      current           : 0,
+      slideWidth        : 0,
+      initialSlideWidth : 0,
+      trackWidth        : 0,
+      touchStart        : null,
+      touchCurrent      : null
     };
   }
 
@@ -76,12 +77,7 @@ export default class Carousel extends Component {
     this.frameElement.addEventListener('touchmove', this.onTouchMove.bind(this));
     this.frameElement.addEventListener('mousemove', this.onTouchMove.bind(this));
 
-    this.setState({
-      ...this.state,
-      slideWidth: this.getSlideOriginalWidth()
-    });
-
-    this.onSlideImageLoad(this.updateDimensions.bind(this));
+    this.onSlideImageLoad(this.init.bind(this));
 
     if (this.props.autoplay) {
       this.startAutoplay();
@@ -119,12 +115,14 @@ export default class Carousel extends Component {
       const img = this.trackElement.querySelector('img');
       if (img) {
         img.onload = () => {
-          cb();
+          cb(img);
         }
 
         if (img.complete) {
-          cb();
+          cb(img);
         }
+      } else {
+        console.warn("slim-react-carousel must contain <img /> to work properly");
       }
     }
   }
@@ -196,6 +194,18 @@ export default class Carousel extends Component {
     }
   }
 
+  init(img) {
+    const initialSlideWidth = this.getSlideOriginalWidth(img);
+
+    this.setState({
+      ...this.state,
+      slideWidth:        initialSlideWidth,
+      initialSlideWidth: initialSlideWidth
+    }, () => {
+      this.updateDimensions();
+    });
+  }
+
   resetTouch() {
     this.setState({
       ...this.state,
@@ -258,11 +268,10 @@ export default class Carousel extends Component {
   updateDimensions() {
     const { slidesToShow, slidePadding } = this.props;
 
-    const wrapperWidth        = this.wrapperElement.offsetWidth;
-    const slideOriginalWidth  = this.getSlideOriginalWidth();
-    const slideWidth          = Math.min(slideOriginalWidth, (wrapperWidth - slidePadding * (slidesToShow + 1)) / slidesToShow);
-    const trackWidth          = (slideWidth + (slidePadding * 2)) * this.getChildren().length;
-    const frameWidth          = Math.min((slideWidth + slidePadding) * slidesToShow + slidePadding, wrapperWidth);
+    const wrapperWidth = this.wrapperElement.offsetWidth;
+    const slideWidth   = Math.min(this.state.initialSlideWidth, (wrapperWidth - slidePadding * (slidesToShow + 1)) / slidesToShow);
+    const trackWidth   = (slideWidth + (slidePadding * 2)) * this.getChildren().length;
+    const frameWidth   = Math.min((slideWidth + slidePadding) * slidesToShow + slidePadding, wrapperWidth);
 
     this.setState({
       ...this.state,
@@ -273,10 +282,11 @@ export default class Carousel extends Component {
     });
   }
 
-  getSlideOriginalWidth() {
-    if (!this.slideElements.length) {
-      return null;
+  getSlideOriginalWidth(img) {
+    if (img) {
+      return img.naturalWidth;
     }
+
     const children = this.slideElements[0].childNodes;
     if (!children[0]) {
       return this.slideElements[0].offsetWidth;

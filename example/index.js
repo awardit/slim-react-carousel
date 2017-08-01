@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import Carousel from '../src/index.js';
 
 const Slide = () => <img src="http://via.placeholder.com/400x150" alt="" />;
+const Slide2 = () => <a href="#"><img src="http://via.placeholder.com/400x150" alt=""/></a>;
 
 ReactDOM.render(
 <div>
@@ -12,6 +13,13 @@ ReactDOM.render(
     controlType="dots"
   >
     <Slide /><Slide /><Slide /><Slide /><Slide />
+  </Carousel>
+
+  <h2>Slide with anchor tag around</h2>
+  <Carousel
+    controlType="dots"
+  >
+    <Slide2 /><Slide2 /><Slide2 /><Slide2 /><Slide2 />
   </Carousel>
 
   <h2>Multiple at once</h2>
