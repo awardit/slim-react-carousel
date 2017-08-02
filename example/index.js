@@ -38,5 +38,13 @@ ReactDOM.render(
       <Slide /><Slide /><Slide /><Slide /><Slide />
     </Slides>
   </Carousel>
+
+  <h2>Vertical</h2>
+  <Carousel>
+    <Slides direction="y" style={{height: "150px", width: "400px"}}>
+      <Slide /><Slide /><Slide /><Slide /><Slide />
+    </Slides>
+    <Arrows />
+  </Carousel>
 </div>
 , document.getElementById('root'));
