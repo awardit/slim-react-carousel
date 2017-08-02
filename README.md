@@ -8,7 +8,7 @@ Coming soon
 Install
 =======
 ```
-npm install --save slim-react-carousel;
+npm install --save slim-react-carousel
 ```
 
 Usage
@@ -16,20 +16,30 @@ Usage
 ```javascript
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Carousel from 'slim-react-carousel';
+import { Carousel, Slides, SlideImg, Arrows, Dots } from 'slim-react-carousel';
 
 ReactDOM.render(
   <Carousel>
-    <div>slide 1</div>
-    <div>slide 2</div>
-    <div>slide 3</div>
+
+    <Slides>
+      <SlideImg><img src="..." /></SlideImg>
+      <SlideImg><img src="..." /></SlideImg>
+      <SlideImg><img src="..." /></SlideImg>
+    </Slides>
+
+    <Arrows />
+    <Dots />
+
   </Carousel>,
   document.body
 );
 ```
 
-Props
-=====
+## Components
+
+
+### Carousel
+
 <table class="table table-bordered table-striped">
   <thead>
     <tr>
@@ -41,28 +51,16 @@ Props
   </thead>
   <tbody>
     <tr>
-      <td>children</td>
-      <td>array</td>
-      <td>[]</td>
-      <td>React children. Just pass the slides as children</td>
-    </tr>
-    <tr>
-      <td>slidesToShow</td>
-      <td>number</td>
-      <td>1</td>
-      <td>How many slides to show at the same time</td>
-    </tr>
-    <tr>
       <td>slidesToScroll</td>
       <td>number</td>
       <td>1</td>
       <td>How many slides to scroll at the same time</td>
     </tr>
     <tr>
-      <td>swiping</td>
+      <td>loopAround</td>
       <td>bool</td>
       <td>true</td>
-      <td>Allow swipe controls</td>
+      <td>Loop around when you pass first / last slide</td>
     </tr>
     <tr>
       <td>autoPlay</td>
@@ -77,16 +75,49 @@ Props
       <td>Time between each slide when autoPlay is enabled</td>
     </tr>
     <tr>
+      <td>resetOnInteraction</td>
+      <td>bool</td>
+      <td>true</td>
+      <td>Padding around each slide</td>
+    </tr>
+  </tbody>
+</table>
+
+### Slides
+
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th style="width: 100px;">name</th>
+      <th style="width: 50px;">type</th>
+      <th style="width: 50px;">default</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>touchProp</td>
+      <td>string</td>
+      <td>clientX</td>
+      <td>Direction of swipes. "clientX" / "clientY"</td>
+    </tr>
+    <tr>
+      <td>dragThreshold</td>
+      <td>number</td>
+      <td>80</td>
+      <td>How many slides to scroll at the same time</td>
+    </tr>
+    <tr>
       <td>slidePadding</td>
       <td>number</td>
       <td>0</td>
       <td>Padding around each slide</td>
     </tr>
     <tr>
-      <td>controlType</td>
-      <td>string</td>
-      <td>""</td>
-      <td>Which control layout to use. Types: `dots`, `nextPrev`</td>
+      <td>slidesToShow</td>
+      <td>number</td>
+      <td>1</td>
+      <td>How many slides to show at the same time</td>
     </tr>
   </tbody>
 </table>
