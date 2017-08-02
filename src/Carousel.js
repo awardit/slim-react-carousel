@@ -29,9 +29,12 @@ export default class Carousel extends Component {
     super(props);
 
     this.state = {
-      current    : 0,
-      numSlides  : 0,
-      slideWidth : 0,
+      current   : 0,
+      numSlides : 0,
+      slideRect : {
+        x: 0,
+        y: 0,
+      },
     };
   }
 
@@ -53,14 +56,9 @@ export default class Carousel extends Component {
     }
   }
 
-  registerAutoplay(autoplay = this.props.autoplay) {
-    this.stopAutoplay();
-
-    if (autoplay) {
-      this.startAutoplay();
-    }
-  }
-
+  /**
+   * @api
+   */
   setCurrent(index) {
     const { numSlides } = this.state;
 
@@ -73,6 +71,9 @@ export default class Carousel extends Component {
     }
   }
 
+  /**
+   * @api
+   */
   modifyCurrent(diff) {
     const { current, numSlides } = this.state;
 
@@ -87,6 +88,9 @@ export default class Carousel extends Component {
     }
   }
 
+  /**
+   * @api
+   */
   prev() {
     if(this.props.loopAround) {
       this.modifyCurrent(-this.props.slidesToScroll);
@@ -96,6 +100,9 @@ export default class Carousel extends Component {
     }
   }
 
+  /**
+   * @api
+   */
   next() {
     if(this.props.loopAround) {
       this.modifyCurrent(this.props.slidesToScroll);
@@ -105,18 +112,34 @@ export default class Carousel extends Component {
     }
   }
 
-  updateSlideWidth(newWidth) {
-    if(newWidth < this.state.slideWidth) {
+  /**
+   * @api
+   */
+  updateSlideRect({ x, y }) {
+    const { x: oX, y: oY } = this.state.slideRect;
+
+    x = Math.max(x, oX);
+    y = Math.max(y, oY);
+
+    if(x === oX && y === oY) {
       return;
     }
 
-    this.setSlideWidth(newWidth);
+    this.setSlideRect({ x, y });
   }
 
-  setSlideWidth(slideWidth) {
-    this.setState({ slideWidth });
+  /**
+   * Sets the maximum slide width used for the slider, prefer to use `updateSlideWidth` instead.
+   *
+   * @api
+   */
+  setSlideRect({ x, y }) {
+    this.setState({ slideRect: { x, y } });
   }
 
+  /**
+   * @api
+   */
   setNumSlides(numSlides) {
     this.setState({
       numSlides,
@@ -124,10 +147,29 @@ export default class Carousel extends Component {
     });
   }
 
+  /**
+   * Resets autoplay timer and will re-register the callback if `autoplay` is true.
+   *
+   * @api
+   */
+  registerAutoplay(autoplay = this.props.autoplay) {
+    this.stopAutoplay();
+
+    if (autoplay) {
+      this.startAutoplay();
+    }
+  }
+
+  /**
+   * @api
+   */
   startAutoplay() {
     this.interval = setInterval(this.next.bind(this), this.props.timer);
   }
 
+  /**
+   * @api
+   */
   stopAutoplay() {
     clearInterval(this.interval);
   }
@@ -136,9 +178,9 @@ export default class Carousel extends Component {
     const { children, slidesToScroll, loopAround, autoplay, timer, resetOnInteraction, ...props } = this.props;
 
     return <div {...props}>{Children.map(children, c => cloneElement(c, {
-      currentSlide:  this.state.current,
-      numSlides:     this.state.numSlides,
-      maxSlideWidth: this.state.slideWidth,
+      currentSlide: this.state.current,
+      numSlides:    this.state.numSlides,
+      maxSlideRect: this.state.slideRect,
     }))}</div>;
   }
 }

@@ -36,7 +36,7 @@ export class Dots extends Component {
   }
 
   render() {
-    const { numSlides, currentSlide, maxSlideWidth, ...props } = this.props;
+    const { numSlides, currentSlide, maxSlideRect, ...props } = this.props;
 
     return (
       <div {...props}>

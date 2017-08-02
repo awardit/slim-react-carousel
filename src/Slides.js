@@ -3,28 +3,38 @@ import PropTypes from "prop-types";
 
 import { CAROUSEL_CTX } from "./Carousel";
 
-const styles = ({ slidePadding, slideWidth }) => ({
-  float:       'left',
-  width:       `${slideWidth}px`,
-  paddingLeft: `${slidePadding}px`
+const delta = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => ({
+  x: x1 - x2,
+  y: y1 - y2,
 });
 
-const trackStyles = ({ slidePadding, currentSlide }, { slideWidth, trackWidth }, { touchCurrent, touchStart }) => {
-  const touchDrag     = (touchCurrent && touchStart) ? touchCurrent.clientX - touchStart.clientX : 0;
-  const xPos          = -(currentSlide * (slideWidth + slidePadding)) + touchDrag;
+const splitWPadding = (length, num, padding) => (length - padding * (num + 1)) / num;
+
+const styles = ({ direction, slidePadding, slide }) => ({
+  float:       'left',
+  width:       direction === "x" ? `${slide}px` : null,
+  height:      direction === "y" ? `${slide}px` : null,
+  paddingLeft: direction === "x" ? `${slidePadding}px` : null,
+  paddingTop:  direction === "y" ? `${slidePadding}px` : null,
+});
+
+const trackStyles = ({ slidePadding, currentSlide, direction, slide, track, dragDelta }) => {
+  const pos = -(currentSlide * (slide + slidePadding)) + dragDelta;
 
   return {
-    transition: touchDrag ? '' : '0.4s ease-in-out transform',
-    width:      trackWidth + 'px',
-    transform:  'translateX(' + xPos + 'px)',
-    overflowX:  'hidden'
+    transition: dragDelta ? '' : '0.4s ease-in-out transform',
+    width:      direction === "x" ? track + 'px' : null,
+    height:     direction === "y" ? track + 'px' : null,
+    transform:  'translate' + direction.toUpperCase() + '(' + pos + 'px)',
   }
 };
 
-const frameStyles = ({ frameWidth }) => ({
-  maxWidth:  frameWidth + 'px',
+const frameStyles = ({ frame, direction }) => ({
+  maxWidth:  direction === "x" ? frame + 'px' : null,
+  maxHeight: direction === "y" ? frame + 'px' : null,
+  overflowX:  direction === "x" ? 'hidden' : null,
+  overflowY:  direction === "y" ? 'hidden' : null,
   transform: 'translateZ(0)',
-  overflow:  'hidden'
 });
 
 export class TouchContainer extends Component {
@@ -37,14 +47,14 @@ export class TouchContainer extends Component {
 
     this.el.addEventListener('dragstart', this.onDragstart);
 
-    this.el.addEventListener('touchstart', this.onTouchStart.bind(this));
-    this.el.addEventListener('mousedown', this.onTouchStart.bind(this));
+    this.el.addEventListener('touchstart', this.onTouchStart);
+    this.el.addEventListener('mousedown',  this.onTouchStart);
 
-    window.addEventListener('touchend', this.onTouchEnd.bind(this));
-    window.addEventListener('mouseup', this.onTouchEnd.bind(this));
+    this.el.addEventListener('touchmove', this.onTouchMove);
+    this.el.addEventListener('mousemove', this.onTouchMove);
 
-    this.el.addEventListener('touchmove', this.onTouchMove.bind(this));
-    this.el.addEventListener('mousemove', this.onTouchMove.bind(this));
+    window.addEventListener('touchend', this.onTouchEnd);
+    window.addEventListener('mouseup', this.onTouchEnd);
   }
 
   componentWillUnmount() {
@@ -74,8 +84,8 @@ export class TouchContainer extends Component {
   getEventTouch(event) {
     if (typeof event.touches === 'undefined') {
       return {
-        clientX: event.clientX,
-        clientY: event.clientY
+        x: event.clientX,
+        y: event.clientY
       };
     }
 
@@ -86,8 +96,8 @@ export class TouchContainer extends Component {
     const ev = event.touches.item(0);
 
     return {
-      clientX: ev.clientX,
-      clientY: ev.clientY
+      x: ev.clientX,
+      y: ev.clientY
     };
   }
 
@@ -139,10 +149,13 @@ export class TouchContainer extends Component {
 
 export class Slides extends TouchContainer {
   static defaultProps = {
-    touchProp:     "clientX",
+    direction:     "x",
     dragThreshold: 80,
     slidePadding:  0,
     slidesToShow:  1,
+    frameStyles:   frameStyles,
+    trackStyles:   trackStyles,
+    slideStyles:   styles,
   };
 
   static contextTypes = {
@@ -185,7 +198,7 @@ export class Slides extends TouchContainer {
   }
 
   touchEnd(touchStart, touchCurrent) {
-    const prop = this.props.touchProp;
+    const prop = this.props.direction;
 
     if (touchCurrent[prop] > (touchStart[prop] + this.props.dragThreshold)) {
       this.context[CAROUSEL_CTX].prev();
@@ -195,28 +208,49 @@ export class Slides extends TouchContainer {
   }
 
   render() {
-    const { children, currentSlide, slidesToShow, maxSlideWidth, slidePadding, numSlides, touchProp, dragThreshold,...props } = this.props;
+    const {
+      children,
+      currentSlide,
+      slidesToShow,
+      maxSlideRect,
+      slidePadding,
+      numSlides,
+      direction,
+      dragThreshold,
+      frameStyles,
+      trackStyles,
+      slideStyles,
+      ...props
+    } = this.props;
+    const { touchCurrent, touchStart } = this.state;
 
-    const wrapperWidth = this.el ? this.el.offsetWidth : 0;
-    const slideWidth   = Math.min(maxSlideWidth, (wrapperWidth - slidePadding * (slidesToShow + 1)) / slidesToShow);
-    const trackWidth   = (slideWidth + (slidePadding * 2)) * numSlides;
-    const frameWidth   = Math.min((slideWidth + slidePadding) * slidesToShow + slidePadding, wrapperWidth);
+    const dragDelta = (touchCurrent && touchStart ? delta(touchCurrent, touchStart) : { x: 0, y: 0 })[direction];
+    const wrapper   = (this.el ? { x: this.el.offsetWidth, y: this.el.offsetHeight } : { x: 0, y: 0 })[direction];
+    const maxSlide  = maxSlideRect[direction];
+    const slide     = Math.min(maxSlide, splitWPadding(wrapper, slidesToShow, slidePadding));
+    const track     = (slide + (slidePadding * 2)) * numSlides;
+    const frame     = Math.min((slide + slidePadding) * slidesToShow + slidePadding, wrapper);
 
     const data = {
-      wrapperWidth,
-      slideWidth,
-      trackWidth,
-      frameWidth,
+      direction,
+      slidePadding,
+      currentSlide,
+      slidesToShow,
+      dragDelta,
+      wrapper,
+      slide,
+      track,
+      frame,
     };
 
     return <div {...props} ref={this.setEl}>
       <div style={frameStyles(data)}>
-        <div style={trackStyles(this.props, data, this.state)}>
+        <div style={trackStyles(data)}>
         {Children.map(children, (slide, i) =>
           <div
             key={i}
             ref={s => this.slideElements[i] = s}
-            style={styles({ slidePadding, slideWidth})}
+            style={slideStyles(data)}
           >
             {slide}
           </div>
@@ -240,7 +274,10 @@ export class SlideImg extends Component {
 
   registerImg = el => {
     const cb = () => {
-      this.context[CAROUSEL_CTX].updateSlideWidth(el.naturalWidth);
+      this.context[CAROUSEL_CTX].updateSlideRect({
+        x: el.naturalWidth,
+        y: el.naturalHeight,
+      });
     };
 
     if(el.complete) {
