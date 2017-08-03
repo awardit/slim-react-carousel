@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 export const CAROUSEL_CTX = "@slim-react-carousel";
 
-export default class Carousel extends Component {
+export class Carousel extends Component {
   static PropTypes = {
     children           : PropTypes.array,
     slidesToScroll     : PropTypes.number,
