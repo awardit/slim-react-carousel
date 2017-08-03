@@ -120,10 +120,10 @@ ReactDOM.render(
       <td>How many slides to show at the same time</td>
     </tr>
     <tr>
-      <td>vertical</td>
-      <td>bool</td>
-      <td>1</td>
-      <td>Use vertical carousel</td>
+      <td>direction</td>
+      <td>string</td>
+      <td>"x"</td>
+      <td>Direction of the carousel. "x" or "y"</td>
     </tr>
     <tr>
       <td>frameStyles</td>
