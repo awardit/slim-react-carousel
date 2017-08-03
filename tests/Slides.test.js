@@ -4,8 +4,12 @@ import { shallow } from 'enzyme';
 
 import { Carousel, Slides, SlideImg, Arrows, Dots } from '../src/index.js';
 
-test('render <Carousel />', t => {
-  const c = shallow(<Carousel></Carousel>);
+test('render <Slides />', t => {
+  const c = shallow(
+  <Carousel>
+    <Slides>
+    </Slides>
+  </Carousel>);
 
   t.equal(c.state().numSlides, 0);
   t.equal(c.state().current, 0);

@@ -141,9 +141,10 @@ export default class Carousel extends Component {
    * @api
    */
   setNumSlides(numSlides) {
+    console.log(this.state.current)
     this.setState({
       numSlides,
-      current: Math.min(Math.max(this.state.current, 0), numSlides - 1),
+      current: Math.min(Math.max(this.state.current, 0), Math.max(numSlides - 1, 0)),
     });
   }
 
