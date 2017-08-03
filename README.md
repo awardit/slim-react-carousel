@@ -119,5 +119,29 @@ ReactDOM.render(
       <td>1</td>
       <td>How many slides to show at the same time</td>
     </tr>
+    <tr>
+      <td>vertical</td>
+      <td>bool</td>
+      <td>1</td>
+      <td>Use vertical carousel</td>
+    </tr>
+    <tr>
+      <td>frameStyles</td>
+      <td>object</td>
+      <td>{}</td>
+      <td>Styling of the frame</td>
+    </tr>
+    <tr>
+      <td>trackStyles</td>
+      <td>object</td>
+      <td>{}</td>
+      <td>Styling of the track</td>
+    </tr>
+    <tr>
+      <td>slideStyles</td>
+      <td>object</td>
+      <td>{}</td>
+      <td>Styling of each slide</td>
+    </tr>
   </tbody>
 </table>
