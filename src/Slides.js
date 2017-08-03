@@ -280,6 +280,10 @@ export class SlideImg extends Component {
       });
     };
 
+    if (el === null) {
+      return;
+    }
+
     if(el.complete) {
       cb();
     }
