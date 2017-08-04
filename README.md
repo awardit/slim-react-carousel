@@ -96,12 +96,6 @@ ReactDOM.render(
   </thead>
   <tbody>
     <tr>
-      <td>touchProp</td>
-      <td>string</td>
-      <td>clientX</td>
-      <td>Direction of swipes. "clientX" / "clientY"</td>
-    </tr>
-    <tr>
       <td>dragThreshold</td>
       <td>number</td>
       <td>80</td>
