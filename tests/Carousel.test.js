@@ -57,3 +57,101 @@ test('Correctly change page when displaying multiple slides and using an uneven 
 
   t.end();
 });
+
+test('Loop around moving forward', t => {
+  startDocument();
+  const c = mount(
+    <Carousel slidesToScroll={3} loopAround={true}>
+      <DummySlides slides={5} />
+    </Carousel>
+  );
+
+  t.equal(c.state().current, 0);
+  t.equal(c.state().numSlides, 5);
+
+  c.instance().next();
+
+  t.equal(c.state().current, 3);
+  t.equal(c.state().numSlides, 5);
+
+  c.instance().next();
+
+  t.equal(c.state().current, 0);
+  t.equal(c.state().numSlides, 5);
+
+  t.end();
+});
+
+test('Don\'t loop around moving forward', t => {
+  startDocument();
+  const c = mount(
+    <Carousel slidesToScroll={3}>
+      <DummySlides slides={5} />
+    </Carousel>
+  );
+
+  t.equal(c.state().current, 0);
+  t.equal(c.state().numSlides, 5);
+
+  c.instance().next();
+
+  t.equal(c.state().current, 3);
+  t.equal(c.state().numSlides, 5);
+
+  c.instance().next();
+
+  t.equal(c.state().current, 3);
+  t.equal(c.state().numSlides, 5);
+
+  t.end();
+});
+
+test('Loop around moving backward', t => {
+  startDocument();
+  const c = mount(
+    <Carousel slidesToScroll={3} loopAround={true}>
+      <DummySlides slides={5} />
+    </Carousel>
+  );
+
+  t.equal(c.state().current, 0);
+  t.equal(c.state().numSlides, 5);
+
+  c.instance().prev();
+
+  t.equal(c.state().current, 2);
+  t.equal(c.state().numSlides, 5);
+
+  c.instance().prev();
+
+  t.equal(c.state().current, 0);
+  t.equal(c.state().numSlides, 5);
+
+  t.end();
+});
+
+test('Don\'t loop around moving backward', t => {
+  startDocument();
+  const c = mount(
+    <Carousel slidesToScroll={3}>
+      <DummySlides slides={5} />
+    </Carousel>
+  );
+
+  c.instance().setCurrent(3);
+
+  t.equal(c.state().current, 3);
+  t.equal(c.state().numSlides, 5);
+
+  c.instance().prev();
+
+  t.equal(c.state().current, 0);
+  t.equal(c.state().numSlides, 5);
+
+  c.instance().prev();
+
+  t.equal(c.state().current, 0);
+  t.equal(c.state().numSlides, 5);
+
+  t.end();
+});

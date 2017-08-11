@@ -234,7 +234,7 @@ export class Slides extends TouchContainer {
     const data = {
       direction,
       slidePadding,
-      currentSlide,
+      currentSlide: ((currentSlide / slidesToShow) | 0) * slidesToShow,
       slidesToShow,
       dragDelta,
       wrapper,

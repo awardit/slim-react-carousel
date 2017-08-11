@@ -30,6 +30,7 @@ ReactDOM.render(
   <h2>Multiple at once</h2>
   <Carousel
     slidesToScroll={3}
+    loopAround={true}
   >
     <Arrows />
     <Slides

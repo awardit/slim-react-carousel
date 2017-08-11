@@ -11,6 +11,7 @@ export class Carousel extends Component {
     autoplay           : PropTypes.bool,
     timer              : PropTypes.number,
     resetOnInteraction : PropTypes.bool,
+    limitScrollIndex   : PropTypes.bool,
   };
 
   static defaultProps = {
@@ -18,7 +19,8 @@ export class Carousel extends Component {
     slidesToScroll     : 1,
     loopAround         : false,
     autoplay           : false,
-    resetOnInteraction : true
+    resetOnInteraction : true,
+    limitScrollIndex   : true,
   }
 
   static childContextTypes = {
@@ -75,15 +77,16 @@ export class Carousel extends Component {
    * @api
    */
   modifyCurrent(diff) {
+    const { limitScrollIndex, resetOnInteraction, slidesToScroll } = this.props;
     const { current, numSlides } = this.state;
 
-    const idx = (diff % numSlides);
+    const idx = limitScrollIndex ? (((current + diff) % numSlides) / slidesToScroll | 0) * slidesToScroll : (current + diff) % numSlides;
 
     this.setState({
       current: idx < 0 ? (numSlides + idx) : idx
     });
 
-    if(this.props.resetOnInteraction) {
+    if(resetOnInteraction) {
       this.registerAutoplay();
     }
   }
@@ -104,11 +107,15 @@ export class Carousel extends Component {
    * @api
    */
   next() {
-    if(this.props.loopAround) {
-      this.modifyCurrent(this.props.slidesToScroll);
+    const { loopAround, slidesToScroll } = this.props;
+    const { current, numSlides } = this.state;
+
+    if(loopAround) {
+      this.modifyCurrent(slidesToScroll);
     }
-    else if(this.state.current + this.props.slidesToScroll < this.state.numSlides) {
-      this.setCurrent(this.state.current + this.props.slidesToScroll);
+    // Makes no sense to try to scroll
+    else if(current + slidesToScroll < numSlides) {
+      this.setCurrent(current + slidesToScroll);
     }
   }
 
