@@ -80,10 +80,13 @@ export class Carousel extends Component {
     const { limitScrollIndex, resetOnInteraction, slidesToScroll } = this.props;
     const { current, numSlides } = this.state;
 
-    const idx = limitScrollIndex ? (((current + diff) % numSlides) / slidesToScroll | 0) * slidesToScroll : (current + diff) % numSlides;
+    const index    = (current + diff) % numSlides;
+    // Adjust for negative indexes, if we are limiting to pages we need to add one to adjust for rounding
+    const absolute = index < 0 ? numSlides + index + (limitScrollIndex|0) : index;
+    const adjusted = limitScrollIndex ? (absolute / slidesToScroll | 0) * slidesToScroll : absolute;
 
     this.setState({
-      current: idx < 0 ? (numSlides + idx) : idx
+      current: adjusted
     });
 
     if(resetOnInteraction) {
@@ -182,7 +185,7 @@ export class Carousel extends Component {
   }
 
   render() {
-    const { children, slidesToScroll, loopAround, autoplay, timer, resetOnInteraction, ...props } = this.props;
+    const { children, slidesToScroll, loopAround, autoplay, timer, resetOnInteraction, limitScrollIndex, ...props } = this.props;
 
     return <div {...props}>{Children.map(children, c => cloneElement(c, {
       currentSlide: this.state.current,
