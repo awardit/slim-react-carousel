@@ -107,7 +107,7 @@ export class Carousel extends Component {
     if(this.props.loopAround) {
       this.modifyCurrent(this.props.slidesToScroll);
     }
-    else {
+    else if(this.state.current + this.props.slidesToScroll < this.state.numSlides) {
       this.setCurrent(this.state.current + this.props.slidesToScroll);
     }
   }
