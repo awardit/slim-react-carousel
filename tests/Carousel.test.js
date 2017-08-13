@@ -244,6 +244,69 @@ test('<Carousel />', t =>  {
     t.end();
   });
 
+
+  t.test('setSlideRect', t => {
+    startDocument();
+    const c = mount(
+      <Carousel slidesToScroll={3} loopAround={true}>
+        <DummySlides slides={5} />
+      </Carousel>
+    );
+
+    c.instance().setSlideRect({x: 10, y: 15});
+
+    t.equal(c.state().slideRect.x, 10);
+    t.equal(c.state().slideRect.y, 15);
+
+    t.end();
+  });
+
+  t.test('updateSlideRect shouldn\'t be able to go smaller than original size', t => {
+    startDocument();
+    const c = mount(
+      <Carousel slidesToScroll={3} loopAround={true}>
+        <DummySlides slides={5} />
+      </Carousel>
+    );
+
+    c.instance().setSlideRect({x: 10, y: 15});
+
+    t.equal(c.state().slideRect.x, 10);
+    t.equal(c.state().slideRect.y, 15);
+
+    // shouldn't be able to go larger
+    c.instance().updateSlideRect({x: 5, y: 2});
+
+    t.equal(c.state().slideRect.x, 10);
+    t.equal(c.state().slideRect.y, 15);
+
+    t.end();
+  });
+
+  t.test('setNumSlides', t => {
+    startDocument();
+    const c = mount(
+      <Carousel>
+        <DummySlides slides={5} />
+      </Carousel>
+    );
+
+    c.instance().setNumSlides(8);
+
+    t.equal(c.state().numSlides, 8);
+    t.equal(c.state().current, 0);
+
+    c.instance().setNumSlides(18);
+    c.instance().setCurrent(10);
+    c.instance().setNumSlides(5);
+    t.equal(c.state().numSlides, 5);
+    t.equal(c.state().current, 4);
+
+    t.end();
+  });
+
+  // @TODO: add tests for registerAutoplay, startAutoplay and stopAutoplay
+
   t.end();
 });
 
