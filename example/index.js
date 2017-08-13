@@ -4,11 +4,12 @@ import ReactDOM from 'react-dom';
 import { Carousel, Slides, SlideImg, Arrows, Dots } from '../src/index.js';
 
 const Slide = () => <SlideImg src="http://via.placeholder.com/400x150" alt="" />;
+const SlideGreen = () => <SlideImg src="http://via.placeholder.com/400x150/00ff00/ffffff" alt="" />;
 const Slide2 = () => <a href="#"><SlideImg src="http://via.placeholder.com/400x150" alt=""/></a>;
 
 ReactDOM.render(
 <div>
-  <h2>Normal</h2>
+  <h2>Slide</h2>
   <Carousel
     autoplay={true}
   >
@@ -18,8 +19,21 @@ ReactDOM.render(
     <Arrows />
   </Carousel>
 
+  <h2>Fade</h2>
+  <Carousel
+    autoplay={true}
+    transition="fade"
+    loopAround={true}
+  >
+    <Slides>
+      <Slide /><SlideGreen /><Slide /><SlideGreen /><Slide />
+    </Slides>
+    <Dots />
+  </Carousel>
+
   <h2>Slide with anchor tag around</h2>
   <Carousel
+    loopAround={true}
   >
     <Slides>
       <Slide2 /><Slide2 /><Slide2 /><Slide2 /><Slide2 />

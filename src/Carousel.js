@@ -1,7 +1,8 @@
 import React, { Component, Children, cloneElement }  from 'react';
 import PropTypes from 'prop-types';
+import { TRANSITION_TYPES } from './constants';
 
-export const CAROUSEL_CTX = "@slim-react-carousel";
+export const CAROUSEL_CTX = '@slim-react-carousel';
 
 export class Carousel extends Component {
   static PropTypes = {
@@ -12,6 +13,7 @@ export class Carousel extends Component {
     timer              : PropTypes.number,
     resetOnInteraction : PropTypes.bool,
     limitScrollIndex   : PropTypes.bool,
+    transition         : PropTypes.oneOf('slide', 'fade')
   };
 
   static defaultProps = {
@@ -21,6 +23,7 @@ export class Carousel extends Component {
     autoplay           : false,
     resetOnInteraction : true,
     limitScrollIndex   : true,
+    transition         : TRANSITION_TYPES.SLIDE,
   }
 
   static childContextTypes = {
@@ -191,6 +194,7 @@ export class Carousel extends Component {
       currentSlide: this.state.current,
       numSlides:    this.state.numSlides,
       maxSlideRect: this.state.slideRect,
+      transition:   this.props.transition,
     }))}</div>;
   }
 }

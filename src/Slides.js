@@ -1,7 +1,8 @@
 import React, { Component, Children } from 'react';
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 
-import { CAROUSEL_CTX } from "./Carousel";
+import { TRANSITION_TYPES } from './constants';
+import { CAROUSEL_CTX } from './Carousel';
 
 const delta = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => ({
   x: x1 - x2,
@@ -12,28 +13,35 @@ const splitWPadding = (length, num, padding) => (length - padding * (num + 1)) /
 
 const styles = ({ direction, slidePadding, slide }) => ({
   float:       'left',
-  width:       direction === "x" ? `${slide}px` : null,
-  height:      direction === "y" ? `${slide}px` : null,
-  paddingLeft: direction === "x" ? `${slidePadding}px` : null,
-  paddingTop:  direction === "y" ? `${slidePadding}px` : null,
+  width:       direction === 'x' ? `${slide}px` : null,
+  height:      direction === 'y' ? `${slide}px` : null,
+  paddingLeft: direction === 'x' ? `${slidePadding}px` : null,
+  paddingTop:  direction === 'y' ? `${slidePadding}px` : null,
 });
 
-const trackStyles = ({ slidePadding, currentSlide, direction, slide, track, dragDelta }) => {
-  const pos = -(currentSlide * (slide + slidePadding)) + dragDelta;
+const trackStyles = ({ slidePadding, currentSlide, direction, slide, track, dragDelta, transition }) => {
+  const pos = -(currentSlide * (slide + slidePadding)) + (transition === TRANSITION_TYPES.SLIDE ? dragDelta : 0);
 
-  return {
+  const styles = {
     transition: dragDelta ? '' : '0.4s ease-in-out transform',
-    width:      direction === "x" ? track + 'px' : null,
-    height:     direction === "y" ? track + 'px' : null,
+    width:      direction === 'x' ? track + 'px' : null,
+    height:     direction === 'y' ? track + 'px' : null,
     transform:  'translate' + direction.toUpperCase() + '(' + pos + 'px)',
+  };
+
+  if (transition === TRANSITION_TYPES.FADE) {
+    styles.transition = '';
+    styles.transform = '';
   }
+
+  return styles;
 };
 
 const frameStyles = ({ frame, direction }) => ({
-  maxWidth:  direction === "x" ? frame + 'px' : null,
-  maxHeight: direction === "y" ? frame + 'px' : null,
-  overflowX:  direction === "x" ? 'hidden' : null,
-  overflowY:  direction === "y" ? 'hidden' : null,
+  maxWidth:  direction === 'x' ? frame + 'px' : null,
+  maxHeight: direction === 'y' ? frame + 'px' : null,
+  overflowX:  direction === 'x' ? 'hidden' : null,
+  overflowY:  direction === 'y' ? 'hidden' : null,
   transform: 'translateZ(0)',
 });
 
@@ -149,7 +157,7 @@ export class TouchContainer extends Component {
 
 export class Slides extends TouchContainer {
   static defaultProps = {
-    direction:     "x",
+    direction:     'x',
     dragThreshold: 80,
     slidePadding:  0,
     slidesToShow:  1,
@@ -170,8 +178,8 @@ export class Slides extends TouchContainer {
   }
 
   componentWillMount() {
-    if( ! this.context[CAROUSEL_CTX] && process.env.NODE_ENV !== "production") {
-      console.error("<Slides /> must be nested inside of a <Carousel />")
+    if( ! this.context[CAROUSEL_CTX] && process.env.NODE_ENV !== 'production') {
+      console.error('<Slides /> must be nested inside of a <Carousel />')
     }
   }
 
@@ -180,13 +188,13 @@ export class Slides extends TouchContainer {
 
     this.context[CAROUSEL_CTX].setNumSlides(this.slideElements.length);
 
-    window.addEventListener("resize", this.updateDimensions);
+    window.addEventListener('resize', this.updateDimensions);
   }
 
   componentWillUnmount() {
     TouchContainer.prototype.componentWillUnmount.call(this);
 
-    window.removeEventListener("resize", this.updateDimensions);
+    window.removeEventListener('resize', this.updateDimensions);
   }
 
   updateDimensions = () => {
@@ -220,6 +228,7 @@ export class Slides extends TouchContainer {
       frameStyles,
       trackStyles,
       slideStyles,
+      transition,
       ...props
     } = this.props;
     const { touchCurrent, touchStart } = this.state;
@@ -241,6 +250,21 @@ export class Slides extends TouchContainer {
       slide,
       track,
       frame,
+      transition
+    };
+
+    const mergedSlideStyles = (i) => {
+      if (transition === TRANSITION_TYPES.FADE) {
+        const isCurrent = (currentSlide === i) ? 1 : 0;
+        return {
+          ...slideStyles(data),
+          zIndex:     isCurrent,
+          opacity:    isCurrent,
+          transition: '0.4s ease-in-out opacity',
+          position:   (i !== 0) ? 'absolute' : 'static'
+        }
+      }
+      return slideStyles(data);
     };
 
     return <div {...props} ref={this.setEl}>
@@ -250,7 +274,7 @@ export class Slides extends TouchContainer {
           <div
             key={i}
             ref={s => this.slideElements[i] = s}
-            style={slideStyles(data)}
+            style={mergedSlideStyles(i)}
           >
             {slide}
           </div>
@@ -267,8 +291,8 @@ export class SlideImg extends Component {
   };
 
   componentWillMount() {
-    if( ! this.context[CAROUSEL_CTX] && process.env.NODE_ENV !== "production") {
-      console.error("<SlideImg /> must be nested inside of a <Carousel />")
+    if( ! this.context[CAROUSEL_CTX] && process.env.NODE_ENV !== 'production') {
+      console.error('<SlideImg /> must be nested inside of a <Carousel />')
     }
   }
 
@@ -293,6 +317,6 @@ export class SlideImg extends Component {
   }
 
   render() {
-    return <img style={{width: "100%"}} {...this.props} ref={this.registerImg} />;
+    return <img style={{width: '100%'}} {...this.props} ref={this.registerImg} />;
   }
 }
