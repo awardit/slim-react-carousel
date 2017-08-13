@@ -158,6 +158,27 @@ test('<Carousel />', t =>  {
       t.end();
     });
 
+    t.test('slidesToScroll=1, transition=fade slides=5, loopAround=true', t => {
+      startDocument();
+      const c = mount(
+        <Carousel loopAround={true} transition={"fade"}>
+          <DummySlides slides={5} />
+        </Carousel>
+      );
+
+      c.instance().setCurrent(0);
+
+      t.equal(c.state().current, 0);
+      t.equal(c.state().numSlides, 5);
+
+      c.instance().prev();
+
+      t.equal(c.state().current, 4);
+      t.equal(c.state().numSlides, 5);
+
+      t.end();
+    });
+
     t.test('slidesToScroll=3, slides=5, loopAround=true', t => {
       startDocument();
       const c = mount(
