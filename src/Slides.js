@@ -210,7 +210,6 @@ export class Slides extends TouchContainer {
   render() {
     const {
       children,
-      currentSlide,
       slidesToShow,
       maxSlideRect,
       slidePadding,
@@ -220,6 +219,10 @@ export class Slides extends TouchContainer {
       frameStyles,
       trackStyles,
       slideStyles,
+      slidesToScroll,
+      currentPage,
+      currentSlide,
+      numPages,
       ...props
     } = this.props;
     const { touchCurrent, touchStart } = this.state;
@@ -234,7 +237,7 @@ export class Slides extends TouchContainer {
     const data = {
       direction,
       slidePadding,
-      currentSlide: ((currentSlide / slidesToShow) | 0) * slidesToShow,
+      currentSlide: ((currentSlide / slidesToScroll) | 0) * slidesToScroll,
       slidesToShow,
       dragDelta,
       wrapper,
@@ -243,7 +246,7 @@ export class Slides extends TouchContainer {
       frame,
     };
 
-    return <div {...props} ref={this.setEl}>
+    return <div { ...props } ref={this.setEl}>
       <div style={frameStyles(data)}>
         <div style={trackStyles(data)}>
         {Children.map(children, (slide, i) =>

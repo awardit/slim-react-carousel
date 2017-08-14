@@ -158,10 +158,10 @@ test('<Carousel />', t =>  {
       t.end();
     });
 
-    t.test('slidesToScroll=1, transition=fade slides=5, loopAround=true', t => {
+    t.test('slidesToScroll=1, slides=5, loopAround=true', t => {
       startDocument();
       const c = mount(
-        <Carousel loopAround={true} transition={"fade"}>
+        <Carousel loopAround={true}>
           <DummySlides slides={5} />
         </Carousel>
       );

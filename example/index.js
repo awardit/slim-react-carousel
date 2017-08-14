@@ -56,7 +56,7 @@ ReactDOM.render(
 
   <h2>Vertical</h2>
   <Carousel>
-    <Slides direction="y" style={{height: "150px", width: "400px"}}>
+    <Slides direction="y" dragThreshold={20} style={{height: "150px", width: "400px"}}>
       <Slide /><Slide /><Slide /><Slide /><Slide />
     </Slides>
     <Arrows />

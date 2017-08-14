@@ -185,7 +185,7 @@ export class Carousel extends Component {
   }
 
   render() {
-    const { children, slidesToScroll, loopAround, autoplay, timer, resetOnInteraction, limitScrollIndex, ...props } = this.props;
+    const { children, slidesToScroll, loopAround, autoplay, timer, resetOnInteraction, limitScrollIndex, currentPage, numPages, ...props } = this.props;
 
     return <div {...props}>{Children.map(children, c => cloneElement(c, {
       currentSlide:   this.state.current,
