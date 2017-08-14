@@ -36,15 +36,16 @@ export class Dots extends Component {
   }
 
   render() {
-    const { numSlides, currentSlide, maxSlideRect, ...props } = this.props;
+    const { numPages, slidesToScroll, currentPage, maxSlideRect, ...props } = this.props;
+    console.log(numPages);
 
     return (
       <div {...props}>
-        {Array.from({length: numSlides}, (v, k) => k).map(x =>
+        {Array.from({length: numPages }, (v, k) => k).map(x =>
           <button
             key={x}
-            className={currentSlide === x ? 'carousel__dot carousel__dot--active' : 'carousel__dot'}
-            onClick={() => this.context[CAROUSEL_CTX].setCurrent(x)}
+            className={currentPage === x ? 'carousel__dot carousel__dot--active' : 'carousel__dot'}
+            onClick={() => this.context[CAROUSEL_CTX].setCurrent(x * slidesToScroll)}
           >
           </button>
         )}

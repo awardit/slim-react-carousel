@@ -20,6 +20,7 @@ ReactDOM.render(
 
   <h2>Slide with anchor tag around</h2>
   <Carousel
+    loopAround={true}
   >
     <Slides>
       <Slide2 /><Slide2 /><Slide2 /><Slide2 /><Slide2 />
@@ -38,6 +39,19 @@ ReactDOM.render(
     slidePadding={10}>
       <Slide /><Slide /><Slide /><Slide /><Slide />
     </Slides>
+  </Carousel>
+
+  <h2>Multiple at once</h2>
+  <Carousel
+    slidesToScroll={2}
+    loopAround={true}
+  >
+    <Slides
+    slidesToShow={2}
+    slidePadding={10}>
+      <Slide /><Slide /><Slide /><Slide /><Slide />
+    </Slides>
+    <Dots />
   </Carousel>
 
   <h2>Vertical</h2>

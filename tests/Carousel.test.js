@@ -206,7 +206,7 @@ test('<Carousel />', t =>  {
 
       c.instance().prev();
 
-      t.equal(c.state().current, 5);
+      t.equal(c.state().current, 4);
       t.equal(c.state().numSlides, 5);
 
       t.end();
