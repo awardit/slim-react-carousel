@@ -1,36 +1,32 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from "prop-types";
 
-import { CAROUSEL_CTX } from "./Carousel";
+import CarouselContext from './CarouselContext'
 
-export class Arrows extends Component {
-  static contextTypes = {
-    [CAROUSEL_CTX]: PropTypes.object
-  };
+export class Arrows extends React.Component {
+  static contextType = CarouselContext;
 
   componentWillMount() {
-    if( ! this.context[CAROUSEL_CTX] && process.env.NODE_ENV !== "production") {
+    if (!this.context && process.env.NODE_ENV !== "production") {
       console.error("<Arrows /> must be nested inside of a <Carousel />")
     }
   }
 
   render() {
     return (
-      <div>
-        <button onClick={() => this.context[CAROUSEL_CTX].prev()}>prev</button>
-        <button onClick={() => this.context[CAROUSEL_CTX].next()}>next</button>
-      </div>
+      <React.Fragment>
+        <button onClick={() => this.context.prev()}>prev</button>
+        <button onClick={() => this.context.next()}>next</button>
+      </React.Fragment>
     );
   }
 }
 
-export class Dots extends Component {
-  static contextTypes = {
-    [CAROUSEL_CTX]: PropTypes.object
-  };
+export class Dots extends React.Component {
+  static contextType = CarouselContext;
 
   componentWillMount() {
-    if( ! this.context[CAROUSEL_CTX] && process.env.NODE_ENV !== "production") {
+    if (!this.context && process.env.NODE_ENV !== "production") {
       console.error("<Arrows /> must be nested inside of a <Carousel />")
     }
   }
@@ -44,7 +40,7 @@ export class Dots extends Component {
           <button
             key={x}
             className={currentPage === x ? 'carousel__dot carousel__dot--active' : 'carousel__dot'}
-            onClick={() => this.context[CAROUSEL_CTX].setCurrent(x * slidesToScroll)}
+            onClick={() => this.context.setCurrent(x * slidesToScroll)}
           >
           </button>
         )}

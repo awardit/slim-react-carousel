@@ -1,7 +1,7 @@
-import React, { Component, Children } from 'react';
+import React from 'react';
 import PropTypes from "prop-types";
 
-import { CAROUSEL_CTX } from "./Carousel";
+import CarouselContext from './CarouselContext';
 
 const delta = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => ({
   x: x1 - x2,
@@ -10,7 +10,7 @@ const delta = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => ({
 
 const splitWPadding = (length, num, padding) => (length - padding * (num + 1)) / num;
 
-const styles = ({ direction, slidePadding, slide }) => ({
+const slideDefault = ({ direction, slidePadding, slide }) => ({
   float:       'left',
   width:       direction === "x" ? `${slide}px` : null,
   height:      direction === "y" ? `${slide}px` : null,
@@ -18,7 +18,7 @@ const styles = ({ direction, slidePadding, slide }) => ({
   paddingTop:  direction === "y" ? `${slidePadding}px` : null,
 });
 
-const trackStyles = ({ slidePadding, currentSlide, direction, slide, track, dragDelta }) => {
+const trackDefault = ({ slidePadding, currentSlide, direction, slide, track, dragDelta }) => {
   const pos = -(currentSlide * (slide + slidePadding)) + dragDelta;
 
   return {
@@ -29,7 +29,7 @@ const trackStyles = ({ slidePadding, currentSlide, direction, slide, track, drag
   }
 };
 
-const frameStyles = ({ frame, direction }) => ({
+const frameDefault = ({ frame, direction }) => ({
   maxWidth:  direction === "x" ? frame + 'px' : null,
   maxHeight: direction === "y" ? frame + 'px' : null,
   overflowX:  direction === "x" ? 'hidden' : null,
@@ -37,13 +37,15 @@ const frameStyles = ({ frame, direction }) => ({
   transform: 'translateZ(0)',
 });
 
-export class TouchContainer extends Component {
+export class TouchContainer extends React.Component {
+  static contextType = CarouselContext;
+
   setEl = el => this.el = el;
 
   componentDidMount() {
-    if( ! this.el) {
-      return;
-    }
+    if (!this.el) return;
+
+    this.carouselContext = this.context;
 
     this.el.addEventListener('dragstart', this.onDragstart);
 
@@ -61,9 +63,7 @@ export class TouchContainer extends Component {
     window.removeEventListener('touchend', this.onTouchEnd);
     window.removeEventListener('mouseup', this.onTouchEnd);
 
-    if( ! this.el) {
-      return;
-    }
+    if (!this.el) return;
 
     this.el.removeEventListener('dragstart', this.onDragstart);
 
@@ -75,7 +75,7 @@ export class TouchContainer extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if(this.props.currentSlide !== nextProps.currentSlide) {
+    if (this.props.currentSlide !== nextProps.currentSlide) {
       // Reset touch when the user interacts with the slider while we are dragging
       this.touchReset();
     }
@@ -89,9 +89,7 @@ export class TouchContainer extends Component {
       };
     }
 
-    if (!event.touches.length) {
-      return null;
-    }
+    if (!event.touches.length) return null;
 
     const ev = event.touches.item(0);
 
@@ -101,14 +99,12 @@ export class TouchContainer extends Component {
     };
   }
 
-  onDragstart = e => {
-    e.preventDefault();
-  }
+  onDragstart = e => e.preventDefault();
 
   onTouchStart = e => {
     const touch = this.getEventTouch(e);
 
-    this.context[CAROUSEL_CTX].stopAutoplay();
+    this.carouselContext.stopAutoplay();
 
     this.setState({
       touchStart:   touch,
@@ -117,9 +113,7 @@ export class TouchContainer extends Component {
   }
 
   onTouchMove = e => {
-    if ( ! this.state.touchStart) {
-      return;
-    }
+    if (!this.state.touchStart) return;
 
     this.setState({
       touchCurrent: this.getEventTouch(e)
@@ -127,9 +121,7 @@ export class TouchContainer extends Component {
   }
 
   onTouchEnd = e => {
-    if ( ! this.state.touchStart) {
-      return;
-    }
+    if (!this.state.touchStart) return;
 
     this.touchEnd(this.state.touchStart, this.state.touchCurrent);
     this.touchReset();
@@ -141,26 +133,31 @@ export class TouchContainer extends Component {
       touchCurrent: null,
     });
 
-    this.context[CAROUSEL_CTX].registerAutoplay();
+    this.carouselContext.registerAutoplay();
   }
 
   touchEnd(touchStart, touchEnd) {}
 }
 
 export class Slides extends TouchContainer {
+  static propTypes = {
+    direction:     PropTypes.string,
+    dragThreshold: PropTypes.number,
+    slidePadding:  PropTypes.number,
+    slidesToShow:  PropTypes.number,
+  };
+
   static defaultProps = {
     direction:     "x",
     dragThreshold: 80,
     slidePadding:  0,
     slidesToShow:  1,
-    frameStyles:   frameStyles,
-    trackStyles:   trackStyles,
-    slideStyles:   styles,
+    frameStyles:   frameDefault,
+    trackStyles:   trackDefault,
+    slideStyles:   slideDefault,
   };
 
-  static contextTypes = {
-    [CAROUSEL_CTX]: PropTypes.object
-  };
+  static contextType = CarouselContext;
 
   constructor(props) {
     super(props);
@@ -170,7 +167,7 @@ export class Slides extends TouchContainer {
   }
 
   componentWillMount() {
-    if( ! this.context[CAROUSEL_CTX] && process.env.NODE_ENV !== "production") {
+    if (!this.context && process.env.NODE_ENV !== "production") {
       console.error("<Slides /> must be nested inside of a <Carousel />")
     }
   }
@@ -178,7 +175,7 @@ export class Slides extends TouchContainer {
   componentDidMount() {
     TouchContainer.prototype.componentDidMount.call(this);
 
-    this.context[CAROUSEL_CTX].setNumSlides(this.slideElements.length);
+    this.context.setNumSlides(this.slideElements.length);
 
     window.addEventListener("resize", this.updateDimensions);
   }
@@ -190,9 +187,7 @@ export class Slides extends TouchContainer {
   }
 
   updateDimensions = () => {
-    if( ! this.el) {
-      return;
-    }
+    if (!this.el) return;
 
     this.forceUpdate();
   }
@@ -201,9 +196,9 @@ export class Slides extends TouchContainer {
     const prop = this.props.direction;
 
     if (touchCurrent[prop] > (touchStart[prop] + this.props.dragThreshold)) {
-      this.context[CAROUSEL_CTX].prev();
+      this.carouselContext.prev();
     } else if (touchCurrent[prop] < (touchStart[prop] - this.props.dragThreshold)) {
-      this.context[CAROUSEL_CTX].next();
+      this.carouselContext.next();
     }
   }
 
@@ -225,6 +220,7 @@ export class Slides extends TouchContainer {
       numPages,
       ...props
     } = this.props;
+
     const { touchCurrent, touchStart } = this.state;
 
     const dragDelta = (touchCurrent && touchStart ? delta(touchCurrent, touchStart) : { x: 0, y: 0 })[direction];
@@ -246,56 +242,46 @@ export class Slides extends TouchContainer {
       frame,
     };
 
-    return <div { ...props } ref={this.setEl}>
-      <div style={frameStyles(data)}>
-        <div style={trackStyles(data)}>
-        {Children.map(children, (slide, i) =>
-          <div
-            key={i}
-            ref={s => this.slideElements[i] = s}
-            style={slideStyles(data)}
-          >
-            {slide}
+    return (
+      <div { ...props } ref={this.setEl}>
+        <div style={frameStyles(data)}>
+          <div style={trackStyles(data)}>
+            {React.Children.map(children, (child, i) => (
+              <div
+                key={i}
+                ref={s => this.slideElements[i] = s}
+                style={slideStyles(data)}
+              >
+                {child}
+                <p>{i}</p>
+              </div>
+            ))}
           </div>
-        )}
         </div>
       </div>
-    </div>;
+    );
   }
 }
 
-export class SlideImg extends Component {
-  static contextTypes = {
-    [CAROUSEL_CTX]: PropTypes.object
-  };
+export class SlideImg extends React.Component {
+  static contextType = CarouselContext;
 
   componentWillMount() {
-    if( ! this.context[CAROUSEL_CTX] && process.env.NODE_ENV !== "production") {
-      console.error("<SlideImg /> must be nested inside of a <Carousel />")
+    if (!this.context && process.env.NODE_ENV !== "production") {
+      console.error("<SlideImg /> must be nested inside of a <Carousel />");
     }
   }
 
-  registerImg = el => {
-    const cb = () => {
-      this.context[CAROUSEL_CTX].updateSlideRect({
+  render() {
+    const registerImg = el => {
+      if (!el) return;
+
+      this.context.updateSlideRect({
         x: el.naturalWidth,
         y: el.naturalHeight,
       });
     };
 
-    if (el === null) {
-      return;
-    }
-
-    if(el.complete) {
-      cb();
-    }
-    else {
-      el.onload = cb;
-    }
-  }
-
-  render() {
-    return <img style={{width: "100%"}} {...this.props} ref={this.registerImg} />;
+    return <img style={{width: "100%"}} {...this.props} ref={registerImg} />;
   }
 }
