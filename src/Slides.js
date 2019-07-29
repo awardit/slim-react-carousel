@@ -253,7 +253,6 @@ export class Slides extends TouchContainer {
                 style={slideStyles(data)}
               >
                 {child}
-                <p>{i}</p>
               </div>
             ))}
           </div>
