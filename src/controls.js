@@ -27,7 +27,7 @@ export class Dots extends React.Component {
 
   componentWillMount() {
     if (!this.context && process.env.NODE_ENV !== "production") {
-      console.error("<Arrows /> must be nested inside of a <Carousel />")
+      console.error("<Dots /> must be nested inside of a <Carousel />")
     }
   }
 
@@ -44,6 +44,35 @@ export class Dots extends React.Component {
           >
           </button>
         )}
+      </div>
+    );
+  }
+}
+
+export class Combined extends React.Component {
+  static contextType = CarouselContext;
+
+  componentWillMount() {
+    if (!this.context && process.env.NODE_ENV !== "production") {
+      console.error("<Combined /> must be nested inside of a <Carousel />")
+    }
+  }
+
+  render() {
+    const { numPages, numSlides, currentSlide, slidesToScroll, currentPage, maxSlideRect, ...props } = this.props;
+
+    return (
+      <div {...props}>
+      <button onClick={() => this.context.prev()}>prev</button>
+        {Array.from({length: numPages }, (v, k) => k).map(x =>
+          <button
+            key={x}
+            className={currentPage === x ? 'carousel__dot carousel__dot--active' : 'carousel__dot'}
+            onClick={() => this.context.setCurrent(x * slidesToScroll)}
+          >
+          </button>
+        )}
+        <button onClick={() => this.context.next()}>next</button>
       </div>
     );
   }
