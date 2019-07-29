@@ -276,10 +276,19 @@ export class SlideImg extends React.Component {
     const registerImg = el => {
       if (!el) return;
 
-      this.context.updateSlideRect({
-        x: el.naturalWidth,
-        y: el.naturalHeight,
-      });
+      const cb = () => {
+        this.context.updateSlideRect({
+          x: el.naturalWidth,
+          y: el.naturalHeight,
+        });
+      }
+
+      if(el.complete) {
+        cb();
+      }
+      else {
+        el.onload = cb;
+      }
     };
 
     return <img style={{width: "100%"}} {...this.props} ref={registerImg} />;
