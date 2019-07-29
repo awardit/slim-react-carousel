@@ -1,10 +1,9 @@
-import React, { Component, Children, cloneElement }  from 'react';
+import React  from 'react';
 import PropTypes from 'prop-types';
+import { CarouselProvider } from './CarouselContext';
 
-export const CAROUSEL_CTX = "@slim-react-carousel";
-
-export class Carousel extends Component {
-  static PropTypes = {
+export class Carousel extends React.Component {
+  static propTypes = {
     children           : PropTypes.array,
     slidesToScroll     : PropTypes.number,
     loopAround         : PropTypes.bool,
@@ -23,26 +22,14 @@ export class Carousel extends Component {
     limitScrollIndex   : true,
   }
 
-  static childContextTypes = {
-    [CAROUSEL_CTX]: PropTypes.object
-  }
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      current   : 0,
-      numSlides : 0,
-      slideRect : {
-        x: 0,
-        y: 0,
-      },
-    };
-  }
-
-  getChildContext = () => ({
-    [CAROUSEL_CTX]: this
-  })
+  state = {
+    current   : 0,
+    numSlides : 0,
+    slideRect : {
+      x: 0,
+      y: 0,
+    },
+  };
 
   componentDidMount() {
     this.registerAutoplay();
@@ -68,7 +55,7 @@ export class Carousel extends Component {
       current: Math.min(Math.max(index, 0), numSlides - 1),
     });
 
-    if(this.props.resetOnInteraction) {
+    if (this.props.resetOnInteraction) {
       this.registerAutoplay();
     }
   }
@@ -82,14 +69,14 @@ export class Carousel extends Component {
 
     const index    = (current + diff) % numSlides;
     // Adjust for negative indexes, if we are limiting to pages we need to add one to adjust for rounding
-    const absolute = index < 0 ? numSlides + index + (limitScrollIndex|0) - ((slidesToScroll === 1) ? 1 : 0) : index;
+    const absolute = index < 0 ? numSlides + index + (limitScrollIndex | 0) - ((slidesToScroll === 1) ? 1 : 0) : index;
     const adjusted = limitScrollIndex ? (absolute / slidesToScroll | 0) * slidesToScroll : absolute;
 
     this.setState({
       current: adjusted
     });
 
-    if(resetOnInteraction) {
+    if (resetOnInteraction) {
       this.registerAutoplay();
     }
   }
@@ -98,7 +85,7 @@ export class Carousel extends Component {
    * @api
    */
   prev() {
-    if(this.props.loopAround) {
+    if (this.props.loopAround) {
       this.modifyCurrent(-this.props.slidesToScroll);
     }
     else {
@@ -113,11 +100,11 @@ export class Carousel extends Component {
     const { loopAround, slidesToScroll } = this.props;
     const { current, numSlides } = this.state;
 
-    if(loopAround) {
+    if (loopAround) {
       this.modifyCurrent(slidesToScroll);
     }
     // Makes no sense to try to scroll
-    else if(current + slidesToScroll < numSlides) {
+    else if (current + slidesToScroll < numSlides) {
       this.setCurrent(current + slidesToScroll);
     }
   }
@@ -131,7 +118,7 @@ export class Carousel extends Component {
     x = Math.max(x, oX);
     y = Math.max(y, oY);
 
-    if(x === oX && y === oY) {
+    if (x === oX && y === oY) {
       return;
     }
 
@@ -185,15 +172,40 @@ export class Carousel extends Component {
   }
 
   render() {
-    const { children, slidesToScroll, loopAround, autoplay, timer, resetOnInteraction, limitScrollIndex, currentPage, numPages, ...props } = this.props;
+    const {
+      children,
+      slidesToScroll,
+      loopAround,
+      autoplay,
+      timer,
+      resetOnInteraction,
+      limitScrollIndex,
+      currentPage,
+      numPages,
+      ...props
+    } = this.props;
 
-    return <div {...props}>{Children.map(children, c => cloneElement(c, {
-      currentSlide:   this.state.current,
-      currentPage:    Math.ceil(this.state.current / this.props.slidesToScroll),
-      numSlides:      this.state.numSlides,
-      numPages:       Math.ceil(this.state.numSlides / this.props.slidesToScroll),
-      maxSlideRect:   this.state.slideRect,
-      slidesToScroll: this.props.slidesToScroll,
-    }))}</div>;
+    return (
+      <CarouselProvider value={{
+        stopAutoplay: this.stopAutoplay.bind(this),
+        registerAutoplay: this.registerAutoplay.bind(this),
+        updateSlideRect: this.updateSlideRect.bind(this),
+        setNumSlides: this.setNumSlides.bind(this),
+        setCurrent: this.setCurrent.bind(this),
+        prev: this.prev.bind(this),
+        next: this.next.bind(this),
+      }}>
+        <div {...props}>
+          {React.Children.map(children, c => React.cloneElement(c, {
+            currentSlide:   this.state.current,
+            currentPage:    Math.ceil(this.state.current / this.props.slidesToScroll),
+            numSlides:      this.state.numSlides,
+            numPages:       Math.ceil(this.state.numSlides / this.props.slidesToScroll),
+            maxSlideRect:   this.state.slideRect,
+            slidesToScroll: this.props.slidesToScroll,
+          }))}
+        </div>
+      </CarouselProvider>
+    )
   }
 }

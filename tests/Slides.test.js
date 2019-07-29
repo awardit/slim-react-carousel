@@ -4,7 +4,7 @@ import PropTypes          from 'prop-types';
 import { shallow, mount } from 'enzyme';
 import jsdom              from 'jsdom';
 
-import { Carousel, Slides, CAROUSEL_CTX } from '../src/index.js';
+import { Carousel, Slides } from '../src/index.js';
 
 function startDocument(doc) {
   global.document  = jsdom.jsdom(doc);

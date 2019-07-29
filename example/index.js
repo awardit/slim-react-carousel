@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 
 import { Carousel, Slides, SlideImg, Arrows, Dots } from '../src/index.js';
 
-const Slide = () => <SlideImg src="http://via.placeholder.com/400x150" alt="" />;
-const Slide2 = () => <a href="#"><SlideImg src="http://via.placeholder.com/400x150" alt=""/></a>;
+const Slide = () => <SlideImg src="http://via.placeholder.com/400x150" alt="slide" />;
+const Slide2 = () => <a href="#"><SlideImg src="http://via.placeholder.com/400x150" alt="slide"/></a>;
 
 ReactDOM.render(
 <div>
