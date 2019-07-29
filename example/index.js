@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Carousel, Slides, SlideImg, Arrows, Dots } from '../src/index.js';
+import { Carousel, Slides, SlideImg, Arrows, Dots, Combined } from '../src/index.js';
 
 const Slide = () => <SlideImg src="http://via.placeholder.com/400x150" alt="slide" />;
 const Slide2 = () => <a href="#"><SlideImg src="http://via.placeholder.com/400x150" alt="slide"/></a>;
@@ -60,6 +60,14 @@ ReactDOM.render(
       <Slide /><Slide /><Slide /><Slide /><Slide />
     </Slides>
     <Arrows />
+  </Carousel>
+
+  <h2>Combined controls</h2>
+  <Carousel>
+    <Slides>
+      <Slide /><Slide /><Slide /><Slide /><Slide />
+    </Slides>
+    <Combined />
   </Carousel>
 </div>
 , document.getElementById('root'));
