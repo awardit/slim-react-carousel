@@ -283,12 +283,8 @@ export class SlideImg extends React.Component {
         });
       }
 
-      if(el.complete) {
-        cb();
-      }
-      else {
-        el.onload = cb;
-      }
+      if (el.complete) cb();
+      else el.onload = cb;
     };
 
     return <img style={{width: "100%"}} {...this.props} ref={registerImg} />;
