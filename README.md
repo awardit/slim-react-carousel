@@ -1,4 +1,7 @@
 # Slim React Carousel
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/crossroads-loyalty-solutions/slim-react-carousel.svg)](https://greenkeeper.io/)
+
 A small composable carousel using React for rendering.
 
 Demo
